@@ -518,6 +518,10 @@ components:
           description: Corresponds with the field "Faktura Bemerkungen"
           type: string
 
+        adServerId:
+          description: Corresponds with the field "AdServer"
+          type: string
+
         keyValueSets:
           description: Corresponds with the field "Targeting Configuration -> Key / Values"
           type: array
