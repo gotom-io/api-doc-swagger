@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 2.0.0
+  version: 2.1.0
   title: goTom API for Campaigns and Flights
 
 paths:
@@ -495,8 +495,13 @@ components:
           type: integer
 
         bruttoPriceUnit:
-          description: Corresponds with the field "Finaler Bruttopreis Einheit"
-          type: number
+          description: | 
+            Corresponds with the field "Finaler Bruttopreis Einheit". 
+            Can be a number (ie 15.20), or the string "loadFromRate" (will autoload the price from the rate sheet). 
+            Can be omitted when updating a flight (existing bruttoPriceUnit will stay the same)
+          oneOf:
+            - type: string
+            - type: number
 
         advertisingStatus:
           description: Corresponds with the field "WM Status"
@@ -528,9 +533,27 @@ components:
           items:
             $ref: '#/components/schemas/KeyValueSet'
 
+        geoTargetingByZip:
+          description: Corresponds with the field "Targeting Configuration -> Geo Targeting -> PLZ"
+          type: object
+          properties:
+            countryId:
+              type: string
+              enum:
+                - US
+                - CA
+                - DE
+                - FR
+                - GB
+                - IN
+            zipCodes:
+              description: Comma separated list of zip codes
+              type: string
+
     FlightCreate:
       required:
         - externalId
+        - adServerId
         - runtime
         - tarifId
         - mediaId
@@ -539,6 +562,7 @@ components:
         - advertisingId
         - priceTypeId
         - units
+        - bruttoPriceUnit
       allOf:
         - $ref: "#/components/schemas/Flight"
         - type: object
