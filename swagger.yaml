@@ -337,12 +337,14 @@ components:
                 adServerId:
                   type: string
                 types:
-                  type: string
-                  enum:
-                    - runtime
-                    - units
-                    - other
-                    - placements
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - runtime
+                      - units
+                      - other
+                      - placements
                 remarks:
                   type: string
 
