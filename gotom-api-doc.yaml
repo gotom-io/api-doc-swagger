@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: 3.0.0
-  title: goTom API
+  title: goTom API Documentation
 
 paths:
   /app-api/campaign:
