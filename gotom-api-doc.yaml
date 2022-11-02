@@ -712,7 +712,7 @@ components:
     KeyValue:
       properties:
         id:
-          description: AdServer Id of KeyValue
+          description: AdServer Id of KeyValue or "audiencesegment" for an Audience Segment
           type: string
         label:
           type: string
@@ -730,7 +730,7 @@ components:
     KeyValueValue:
       properties:
         id:
-          description: AdServer Id of KeyValue Value or "custom_{value}" for freetext values. For example the freetext value "15" has to be "custom_15"
+          description: AdServer Id of KeyValue/Audience Segment Value or "custom_{value}" for freetext values. For example the freetext value "15" has to be "custom_15"
           type: string
         label:
           type: string
