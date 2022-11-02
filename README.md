@@ -1,7 +1,7 @@
 ## goTom Api Doc (Swagger)
 
-Visit https://gotom-io.github.io/api-doc-swagger/ for web view.
+Visit [api-doc.gotom.io](https://api-doc.gotom.io) for a swagger web view.
 
-Visit https://github.com/gotom-io/api-doc-swagger/blob/master/swagger.yaml for YAML view.
+or show the YAML in plaintext [gotom-api-doc.yaml](gotom-api-doc.yaml)
 
 Contact your account manager or support@gotom.io for receiving authentication credentials.
