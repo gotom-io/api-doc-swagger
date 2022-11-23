@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 3.0.0
+  version: 3.1.0
   title: goTom API Documentation
 
 paths:
@@ -275,6 +275,38 @@ paths:
         '404':
           description: The campaign does not exist
 
+  /app-api/campaign/{campaignExternalId}/archive-status:
+    post:
+      tags: [Campaign]
+      summary: Set archive status of a campaign
+      parameters:
+        - in: path
+          name: campaignExternalId
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchiveStatus'
+      responses:
+        '204':
+          description: Archive status was updated successfully
+        '404':
+          description: The campaign does not exist
+        '400':
+          description: >
+            Returns a list of errors in the input data. For this call the following violation codes can be expected
+            * `28a27691-46f0-4bc2-9806-100587d7a962` - The campaign was already billed, cannot archive / unarchive
+            * `e0a1561a-631e-4d1b-99fe-6a7e7f89b4dd` - The campaign was partially invoiced, cannot archive
+        '500':
+          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerErrorResponse'
+
   /app-api/crm-sync-import-external-crm-id/update-customer:
     post:
       tags: [Customer]
@@ -516,7 +548,7 @@ components:
           type: integer
 
         bruttoPriceUnit:
-          description: | 
+          description: |
             Corresponds with the field "Finaler Bruttopreis Einheit". 
             Can be a number (ie 15.20), or the string "loadFromRate" (will autoload the price from the rate sheet). 
             Can be omitted when updating a flight (existing bruttoPriceUnit will stay the same)
@@ -699,6 +731,13 @@ components:
           type: string
           format: byte
           description: base64 encoded file content
+
+    ArchiveStatus:
+      properties:
+        setIsArchived:
+          type: boolean
+          example: true
+          description: true to archive, false to un-archive / activate
 
     KeyValueSet:
       properties:
