@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 3.1.0
+  version: 3.2.0
   title: goTom API Documentation
 
 paths:
@@ -54,7 +54,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CampaignRead'
-
         '404':
           description: Campaign has not been found
 
@@ -150,7 +149,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FlightRead'
-
         '404':
           description: Flight has not been found
     post:
@@ -318,12 +316,83 @@ paths:
               $ref: '#/components/schemas/Customer'
       responses:
         '200':
-          description: Customer has been created or updated
+          description: Customer was created / updated
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/UpdateCustomerResponse'
+                  - type: object
+                    properties:
+                      errorLogs:
+                        type: object
+                        example: null
+
+        '202':
+          description: Customer has not been processed yet (check /error-logs/ endpoint for status)
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      jobId:
+                        example: 123
+                      jobAlreadyFinished:
+                        example: false
+                      reason:
+                        example: blocking_timeout
+
+        '400':
+          description: There was an issue with updating the customer
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/UpdateCustomerResponse"
+                  - type: object
+                    properties:
+                      error:
+                        type: object
+                        properties:
+                          msg:
+                            description: If the customer data fails validation before further processing e.g. is more severely badly formatted like no data or customer sent at all or invalid JSON format.
+                            type: string
+                            example: Request had no body
+                      reason:
+                        description: Indication of what is the status of the processed job.  'data_error' means there was an error when processing data, please check logs. 'blocking_timeout' means job couldn't be processed before returning response. 'blocking_buried' and 'queue_internal' are more severe internal errors.
+                        enum: ['data_error', 'blocking_timeout','blocking_buried','queue_internal']
+                        type: string
+                        example: 'data_error'
+
+  /app-api/crm-sync-import-external-crm-id/error-logs/{jobId}:
+    get:
+      tags: [Customer]
+      summary: Read customer logs to see the current status of processing
+      parameters:
+        - in: path
+          name: jobId
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: If there are found logs they have been returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerErrorLogResponse'
+        '404':
+          description: No job found for this jobId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerErrorLogResponse'
 
 components:
   schemas:
     Campaign:
-      title: A goTom campaign
+      description: A goTom campaign
       type: object
       properties:
         name:
@@ -333,7 +402,7 @@ components:
           description: Corresponds with the field "Status"
           type: string
           default: booking
-          enum: [ booking, reservation ]
+          enum: [booking, reservation]
         bookingDate:
           description: Corresponds with the field "Buchungsdatum"
           type: string
@@ -345,30 +414,24 @@ components:
         campaignTypeReference:
           description: Corresponds with the field "Kampagnentyp Referenz"
           type: string
-
         customer:
           description: Corresponds with the field "Kunde"
           allOf:
             - $ref: "#/components/schemas/ContactRef"
-
         intermediator:
           description: Corresponds with the field "Vermittler"
           allOf:
             - $ref: "#/components/schemas/ContactRef"
-
         agency:
           description: Corresponds with the field "Agentur"
           allOf:
             - $ref: "#/components/schemas/ContactRef"
-
         note:
           description: Corresponds with the Field "Bemerkungen"
           type: string
-
         noteInternal:
           description: Corresponds with the Field "Interne Bemerkungen"
           type: string
-
         noteReservation:
           description: Corresponds with the Field "Reservationsabklärung"
           type: string
@@ -413,7 +476,6 @@ components:
           properties:
             externalId:
               type: string
-
             currency:
               description: Corresponds with the field "Währung". Currency of the campaign (the instance default is used if none is supplied)
               type: string
@@ -467,33 +529,49 @@ components:
               items:
                 $ref: "#/components/schemas/FlightRead"
 
+    CrmSyncErrorLogsMixin:
+      description: used internally to keep DRY
+      type: object
+      properties:
+        errorLogs:
+          type: object
+          nullable: true
+          properties:
+            api_error:
+              description: The logs that show what lead to an error when processing the request e.g. missing externalCrmId on data.
+              type: string
+              example: Class AppBundle\Entity\CustomerAddress expects the key externalCrmId to be present in data. Only "title,firm,softDeleted,externalId" received
+        warningLogs:
+          description: The log that shows what lead to a warning when processing the request e.g. providing not all possible fields with their values or providing fields with values that are not configured and thus not read.
+          nullable: true
+          type: array
+          example: ['Data key contacts provided for type AppBundle\Entity\Customer, but is not a configured attribute. contacts will be ignored. Let the client know, that this attribute should be removed from his request.','Data key id not provided for type AppBundle\Entity\Customer, but is a configured attribute. Did the client forget to send it?']
+          items:
+            type: string
+
     CampaignSalesMixin:
       anyOf:
         - oneOf:
-            -
-              type: object
+            - type: object
               properties:
                 salesSupportId:
                   description: Correspons with the field "Innendienst"
                   type: integer
                   example: 42
-            -
-              type: object
+            - type: object
               properties:
                 salesSupportEmail:
                   description: Correspons with the field "Innendienst"
                   type: string
                   example: sales-support@acme-corp.ch
         - oneOf:
-            -
-              type: object
+            - type: object
               properties:
                 salesId:
                   description: Corresponds with the field "Verkauf"
                   type: integer
                   example: 23
-            -
-              type: object
+            - type: object
               properties:
                 salesEmail:
                   description: Corresponds with the field "Verkauf"
@@ -501,12 +579,12 @@ components:
                   example: sales-support@acme-corp.ch
 
     Flight:
-      title: A goTom Flight
+      description: A goTom Flight
       type: object
       properties:
         runtime:
           type: object
-          title: Start and Enddate of the flight
+          description: Start and Enddate of the flight
           properties:
             start:
               type: object
@@ -628,7 +706,7 @@ components:
         - $ref: "#/components/schemas/FlightCreate"
 
     FlightSublines:
-      title: Represents the sublines for a flight (only for network flights)
+      description: Represents the sublines for a flight (only for network flights)
       type: object
       properties:
         sublines:
@@ -636,42 +714,72 @@ components:
           items:
             properties:
               platformId:
-                title: Platform of the network
+                description: Platform of the network
                 type: integer
               percentage:
-                title: Share of the platform in percent (42.5% = 42.5).
+                description: Share of the platform in percent (42.5% = 42.5).
                 example: 42.5
                 type: number
 
+    UpdateCustomerResponse:
+      description: Response for successful, failed and unfinished costumer update jobs.
+      type: object
+      properties:
+        jobId:
+          description: The job id. Currently this id can reset upon reboot of the server e.g. is not necessarily unique.
+          type: integer
+          example: 123
+        jobAlreadyFinished:
+          description: Whether or not the job was able to return synchronously e.g. if true means the job was processed before the response was returned and thus the logs are returned as well in the response. False means the job still awaits processing.
+          type: boolean
+          example: true
+      allOf:
+        - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
+
+    CustomerErrorLogResponse:
+      description: The logs available when retrieving the customer
+      type: object
+      properties:
+        jobStatus:
+          description: The status of the job in the queue, where JOB_STATUS_FINISHED_OK means all ok
+          enum: ['NO_JOB_FOUND', 'JOB_STATUS_WAITING', 'JOB_STATUS_FINISHED_OK', 'JOB_STATUS_FINISHED_ERROR']
+          type: string
+        sentJobId:
+          description: job Id sent by you.
+          type: integer
+          example: 12
+      allOf:
+        - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
+
     ContactRef:
-      title: This entity represents either a customer, agency, intermediator or publisher, either the external ID or the goTom ID can be set
+      description: This entity represents either a customer, agency, intermediator or publisher, either the external ID or the goTom ID can be set
       type: object
       properties:
         entityId:
-          title: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
+          description: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
           type: integer
         entityExternalId:
-          title: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
+          description: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
           type: string
         addressId:
-          title: ID of the address for this contact (corresponds to the "Adresse" field in the UI)
+          description: ID of the address for this contact (corresponds to the "Adresse" field in the UI)
           type: integer
           nullable: true
         addressExternalId:
-          title: External ID of the address for this contact (corresponds to the "Adresse" field in the UI)
+          description: External ID of the address for this contact (corresponds to the "Adresse" field in the UI)
           type: string
           nullable: true
         personId:
-          title: ID of the person for this contact (corresponds to the "Kontakt" field)
+          description: ID of the person for this contact (corresponds to the "Kontakt" field)
           type: integer
           nullable: true
         personExternalId:
-          title: External ID of the person for this contact (corresponds to the "Kontakt" field)
+          description: External ID of the person for this contact (corresponds to the "Kontakt" field)
           type: string
           nullable: true
 
     DateTimeComponents:
-      title: Represents date and time (timezone is implicitly always the "system timezone" of goTom)
+      description: Represents date and time (timezone is implicitly always the "system timezone" of goTom)
       required:
         - date
       properties:
@@ -679,7 +787,7 @@ components:
           type: string
           format: date
         time:
-          title: Time without seconds in the format HH:MM
+          description: Time without seconds in the format HH:MM
           type: string
           example: 12:34
           pattern: '^\d{2}:\d{2}$'
@@ -693,7 +801,7 @@ components:
         - type: integer
         - type: boolean
         - type: array
-          items: { }
+          items: {}
         - type: object
 
     InternalServerErrorResponse:
@@ -842,7 +950,7 @@ components:
                   description: Intermediator Commission aka VMK (Vermittlerkommission) aka DBE (Direktbuchungsentschädigung) aka 2. Provision aka 2. Agentur-Provision in percent
                   type: number
                 type:
-                  description: | 
+                  description: |
                     Type of commission. 
                     0 = Standard (default) = bkCommission direct / vmkCommission direct
                     2 = bkCommission direct / vmkCommission indirect (Accrual / Rückstellung)
@@ -896,7 +1004,7 @@ components:
                     description: City/Place
                     type: string
                   country:
-                    description: | 
+                    description: |
                       Country (ISO 3166-1 alpha-2 Code) like "CH" / "DE" / "AT"
                       https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
                     type: string
@@ -923,7 +1031,7 @@ components:
               required: [externalCrmId]
               properties:
                 externalCrmId:
-                  description: External CRM Id for referencing the address
+                  description: External CRM Id for referencing the address. If a record with this externalCrmId does not exist, an empty one will be created.
                   type: string
             contacts:
               description: Customer contacts
