@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 3.2.0
+  version: 3.3.0
   title: goTom API Documentation
 
 paths:
@@ -80,6 +80,11 @@ paths:
              * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `entityId`
                in the customer object could not be found), here you have to refer to the `propertyPath` value to
                find out which property caused the error
+             * `fa0401a7-6720-44dd-b443-2389aab8c8b7` - Cannot change campaign status from booking to reservation because flights were already invoiced in this campaign.
+             * `b31b973d-8238-467c-bf01-1e9a4ded9631` - Cannot change campaign customer because flights were already invoiced in this campaign.
+             * `ec75ef78-1db7-4469-a7fc-b14a71e5dbee` - Cannot change campaign agency  because flights were already invoiced in this campaign.
+             * `9e8d02a8-f693-4df3-869e-a16d196d9d8a` - Cannot change campaign intermediator  because flights were already invoiced in this campaign.
+             * `800b5cad-7f13-4b27-b3d6-74fa3c47b4e1` - Cannot change campaign currency  because flights were already invoiced in this campaign.
           content:
             application/json:
               schema:
@@ -190,6 +195,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
+    delete:
+      tags: [ CampaignFlight ]
+      summary: Delete the flight by its external ID
+      parameters:
+        - in: path
+          name: campaignExternalId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: flightExternalId
+          schema:
+            type: string
+          required: true
+      responses:
+        '204':
+          description: Flight has been deleted
+        '400':
+          description: >
+            Returns a list of errors in the input data. For this call the following violation codes can be expected
+            
+            
+            Campaign errors:
+               * `60e2547e-bac4-4738-bcfc-6b38fa847a16` - Delete failed because campaign is already archived.
+               * `1b97b080-933c-40df-8768-e08473736005` - Campaign does not have the status 'reservation' and therefore flights cannot be deleted.
+            
+            
+            Flight errors:  
+               * `cc8b37d1-8c9f-491e-aaf4-05510935b492` - Delete failed because flight is already invoiced.
+               * `ac23616c-a625-47b4-9e58-909c66df5f6d` - Flight already has ad server data and therefore cannot be deleted.
+               * `8665dee6-e755-4904-9df4-93ef5bd64d29` - Flight already has deferred data and therefore cannot be deleted.
+               * `33042bd6-05f3-4691-ba27-4f5cef93f697` - Flight already has publisher payouts and therefore cannot be deleted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolationResponse'
+        '404':
+          description: Flight has not been found
+
 
   /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/sublines:
     get:
@@ -754,6 +798,7 @@ components:
     ContactRef:
       description: This entity represents either a customer, agency, intermediator or publisher, either the external ID or the goTom ID can be set
       type: object
+      nullable: true
       properties:
         entityId:
           description: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
