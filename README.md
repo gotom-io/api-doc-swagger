@@ -1,6 +1,6 @@
 ## goTom Api Doc (Swagger)
 
-Visit [api-doc.gotom.io](https://api-doc.gotom.io) for a swagger web view.
+Visit <a href="https://api-doc.gotom.io" target="_blank">api-doc.gotom.io</a> for a swagger web view.
 
 or show the YAML in plaintext [gotom-api-doc.yaml](gotom-api-doc.yaml)
 
