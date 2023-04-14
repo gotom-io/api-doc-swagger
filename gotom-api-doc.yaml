@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 3.3.0
+  version: 3.4.0
   title: goTom API Documentation
 
 paths:
@@ -861,7 +861,7 @@ components:
         - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
 
     ContactRef:
-      description: This entity represents either a customer, agency, intermediator or publisher, either the external ID or the goTom ID can be set
+      description: This entity represents either a customer, agency, intermediator or publisher, either the external ID or the external CRM ID or the goTom ID can be set
       type: object
       nullable: true
       properties:
@@ -869,7 +869,10 @@ components:
           description: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
           type: integer
         entityExternalId:
-          description: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
+          description: External ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
+          type: string
+        entityExternalCrmId:
+          description: External CRM ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
           type: string
         addressId:
           description: ID of the address for this contact (corresponds to the "Adresse" field in the UI)
@@ -879,12 +882,20 @@ components:
           description: External ID of the address for this contact (corresponds to the "Adresse" field in the UI)
           type: string
           nullable: true
+        addressExternalCrmId:
+          description: External CRM ID of the address for this contact (corresponds to the "Adresse" field in the UI)
+          type: string
+          nullable: true
         personId:
           description: ID of the person for this contact (corresponds to the "Kontakt" field)
           type: integer
           nullable: true
         personExternalId:
           description: External ID of the person for this contact (corresponds to the "Kontakt" field)
+          type: string
+          nullable: true
+        personExternalCrmId:
+          description: External CRM ID of the person for this contact (corresponds to the "Kontakt" field)
           type: string
           nullable: true
 
