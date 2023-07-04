@@ -1023,9 +1023,9 @@ components:
               description: Note on the client
               type: string
             status:
-              description: States if the customer is active or inactive. 1 = active, 2 = inactive
+              description: States if the customer is active or inactive. 1 = active, 0 = inactive
               type: integer
-              enum: [0, 1]
+              enum: [1, 0]
             statusEc:
               description: Customer type. 1 = Customer, 2 = Intermediator, 3 = Agency, 5 = Publisher (Only available with marketer module activated)
               type: integer
