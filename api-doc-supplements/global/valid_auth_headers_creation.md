@@ -34,9 +34,9 @@ This content-type must be used as well in the [`Authorization` header explained 
 This is the most complicated authentication request header. <br/> It contains multiple parts that are concatenated together [(more to that later on)](#putittogetheranchor).
 <br/> The header contains these variables:
 
-1. `provider` which is as well referenced by others as 'auth-scheme'. A simple string provided by gotom.
-2. `user` it is a simple string provided by gotom
-3. `signature` it is a specially encoded token
+1. `provider` is as well referenced by others as 'auth-scheme'. A simple string provided by gotom. Default value is "gotom_app_api".
+2. `user` is a simple string provided by gotom
+3. `signature` is a specially encoded token
 
 #### How to create the `signature` part?
 
