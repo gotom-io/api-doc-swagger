@@ -1056,7 +1056,7 @@ components:
               enum: [0, 2, 3, 7]
             softDeleted:
               description: If this customer should be treated as deleted.
-              example: true
+              example: false
               type: boolean
               default: false
             commission:
@@ -1143,7 +1143,7 @@ components:
                       type: string
                   softDeleted:
                     description: If this address should be treated as deleted.
-                    example: true
+                    example: false
                     type: boolean
                     default: false
             mainAddress:
