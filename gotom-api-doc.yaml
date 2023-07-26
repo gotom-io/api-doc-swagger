@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 3.4.0
+  version: 3.4.1
   title: goTom API Documentation
 
 paths:
@@ -1055,10 +1055,10 @@ components:
               default: 0
               enum: [0, 2, 3, 7]
             softDeleted:
-              description: If this customer should be treated as deleted. 0 = not deleted, 1 = soft deleted
-              type: integer
-              default: 0
-              enum: [0, 1]
+              description: If this customer should be treated as deleted.
+              example: true
+              type: boolean
+              default: false
             commission:
               description: Defines the default commissions for an agency or intermediator. Has no effect on statusEc != 2 or 3.
               type: object
@@ -1142,10 +1142,10 @@ components:
                     items:
                       type: string
                   softDeleted:
-                    description: If this address should be treated as deleted. 0 = not deleted, 1 = soft deleted
-                    type: integer
-                    default: 0
-                    enum: [0, 1]
+                    description: If this address should be treated as deleted.
+                    example: true
+                    type: boolean
+                    default: false
             mainAddress:
               description: Reference to the main address for this customer
               type: object
