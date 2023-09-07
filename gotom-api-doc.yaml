@@ -8,6 +8,9 @@ paths:
     post:
       tags: [Campaign]
       summary: Create the campaign by its external ID
+      parameters:
+        - $ref: "#/components/parameters/updateCommissionsParameter"
+        - $ref: "#/components/parameters/updateCustomerDiscounts"
       requestBody:
         content:
           application/json:
@@ -66,6 +69,8 @@ paths:
           schema:
             type: string
           required: true
+        - $ref: "#/components/parameters/updateCommissionsParameter"
+        - $ref: "#/components/parameters/updateCustomerDiscounts"
       requestBody:
         content:
           application/json:
@@ -499,6 +504,24 @@ paths:
             text/html; charset=UTF-8: {}
 
 components:
+  parameters:
+      updateCommissionsParameter:
+          in: query
+          name: update_commissions
+          schema:
+              type: boolean
+              default: 0
+              enum: [ 0, 1 ]
+          description: Whether to apply the commissions or not
+      updateCustomerDiscounts:
+          in: query
+          name: update_customer_discounts
+          schema:
+              type: boolean
+              default: 0
+              enum: [ 0, 1 ]
+          description: Whether to apply the customer discounts or not
+
   schemas:
     Campaign:
       description: A goTom campaign
