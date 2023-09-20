@@ -1,1302 +1,1323 @@
 openapi: 3.0.0
 info:
-  version: 3.4.1
-  title: goTom API Documentation
+    version: 3.4.1
+    title: goTom API Documentation
 
 paths:
-  /app-api/campaign:
-    post:
-      tags: [Campaign]
-      summary: Create the campaign by its external ID
-      parameters:
-        - $ref: "#/components/parameters/updateCommissionsParameter"
-        - $ref: "#/components/parameters/updateCustomerDiscounts"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CampaignCreate'
-      responses:
-        '201':
-          description: Campaign has been created
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-             * `1f06b2d7-49b4-4b8b-aa66-5172aeb01e97` - The externalId is already in use
-             * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `entityId`
-               in the customer object could not be found), here you have to refer to the `propertyPath` value to
-               find out which property caused the error
-             * `8d6a458b-362a-4b13-b3bb-fe0772a4fc7e` - If you have supplied a currency which is not configured for
-               your goTom instance you will get this error
-             * `6b3befbc-2f01-4ddf-be21-b57898905284` - If a dynamic expression constraint failed. Check the error message for further info.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConstraintViolationResponse'
-        '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+    /app-api/campaign:
+        post:
+            tags: [Campaign]
+            summary: Create the campaign by its external ID
+            parameters:
+                - in: query
+                  name: update_commissions
+                  schema:
+                      type: boolean
+                      default: 0
+                      enum: [ 0, 1 ]
+                  description: >
+                      Has a particular behavior:
+                       * **0**: commissions will not be updated e.g. commission values are 0. Single flight commissions can be updated by setting update_commissions: 1 on the create flight API endpoint. 
+                       * **1**: commissions will be updated. Future flights created will always use those commissions as well (never matter if you set update_commissions to 0 on the flight create API endpoint)
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CampaignCreate'
+            responses:
+                '201':
+                    description: Campaign has been created
+                '400':
+                    description: >
+                        Returns a list of errors in the input data. For this call the following violation codes can be expected
+                         * `1f06b2d7-49b4-4b8b-aa66-5172aeb01e97` - The externalId is already in use
+                         * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `entityId`
+                           in the customer object could not be found), here you have to refer to the `propertyPath` value to
+                           find out which property caused the error
+                         * `8d6a458b-362a-4b13-b3bb-fe0772a4fc7e` - If you have supplied a currency which is not configured for
+                           your goTom instance you will get this error
+                         * `6b3befbc-2f01-4ddf-be21-b57898905284` - If a dynamic expression constraint failed. Check the error message for further info.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ConstraintViolationResponse'
+                '500':
+                    description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
 
-  /app-api/campaign/{campaignExternalId}:
-    get:
-      tags: [Campaign]
-      summary: Retrieve the campaign by its external ID
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-      responses:
-        '200':
-          description: Return the campaign data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CampaignRead'
-        '404':
-          description: Campaign has not been found
+    /app-api/campaign/{campaignExternalId}:
+        get:
+            tags: [Campaign]
+            summary: Retrieve the campaign by its external ID
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+            responses:
+                '200':
+                    description: Return the campaign data
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CampaignRead'
+                '404':
+                    description: Campaign has not been found
 
-    post:
-      tags: [Campaign]
-      summary: Update the campaign by its external ID. All the properties are optional, only the supplied properties are changed.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - $ref: "#/components/parameters/updateCommissionsParameter"
-        - $ref: "#/components/parameters/updateCustomerDiscounts"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CampaignUpdate'
-      responses:
-        '204':
-          description: Campaign has been updated
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-             * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `entityId`
-               in the customer object could not be found), here you have to refer to the `propertyPath` value to
-               find out which property caused the error
-             * `fa0401a7-6720-44dd-b443-2389aab8c8b7` - Cannot change campaign status from booking to reservation because flights were already invoiced in this campaign.
-             * `b31b973d-8238-467c-bf01-1e9a4ded9631` - Cannot change campaign customer because flights were already invoiced in this campaign.
-             * `ec75ef78-1db7-4469-a7fc-b14a71e5dbee` - Cannot change campaign agency  because flights were already invoiced in this campaign.
-             * `9e8d02a8-f693-4df3-869e-a16d196d9d8a` - Cannot change campaign intermediator  because flights were already invoiced in this campaign.
-             * `800b5cad-7f13-4b27-b3d6-74fa3c47b4e1` - Cannot change campaign currency  because flights were already invoiced in this campaign.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConstraintViolationResponse'
-        '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+        post:
+            tags: [Campaign]
+            summary: Update the campaign by its external ID. All the properties are optional, only the supplied properties are changed.
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+                -  in: query
+                   name: update_commissions
+                   schema:
+                       type: boolean
+                       default: 0
+                       enum: [ 0, 1 ]
+                   description: >
+                       Whether to update commissions or not
+                        * **0**: commissions will not be updated and stay the same.
+                        * **1**: commissions will be updated only if the payload as well has values set for the intermediator or agency. It is possible to resend the same values that are already in the system. 
+                       Future flights created will always use those commissions as well (never matter if you set update_commissions to 0 on the flight create API endpoint)
+                - $ref: "#/components/parameters/updateCustomerDiscounts"
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CampaignUpdate'
+            responses:
+                '204':
+                    description: Campaign has been updated
+                '400':
+                    description: >
+                        Returns a list of errors in the input data. For this call the following violation codes can be expected
+                         * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `entityId`
+                           in the customer object could not be found), here you have to refer to the `propertyPath` value to
+                           find out which property caused the error
+                         * `fa0401a7-6720-44dd-b443-2389aab8c8b7` - Cannot change campaign status from booking to reservation because flights were already invoiced in this campaign.
+                         * `b31b973d-8238-467c-bf01-1e9a4ded9631` - Cannot change campaign customer because flights were already invoiced in this campaign.
+                         * `ec75ef78-1db7-4469-a7fc-b14a71e5dbee` - Cannot change campaign agency  because flights were already invoiced in this campaign.
+                         * `9e8d02a8-f693-4df3-869e-a16d196d9d8a` - Cannot change campaign intermediator  because flights were already invoiced in this campaign.
+                         * `800b5cad-7f13-4b27-b3d6-74fa3c47b4e1` - Cannot change campaign currency  because flights were already invoiced in this campaign.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ConstraintViolationResponse'
+                '500':
+                    description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
 
-  /app-api/campaign/{campaignExternalId}/flight:
-    post:
-      tags: [CampaignFlight]
-      summary: Create a new flight
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FlightCreate'
-      responses:
-        '201':
-          description: Flight has been created
-        '404':
-          description: The campaign does not exist
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-             * `1f06b2d7-49b4-4b8b-aa66-5172aeb01e97` - The externalId is already in use
-             * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `platformId`
-               in the customer object could not be found), here you have to refer to the `propertyPath` value to
-               find out which property caused the error
-             * `e3a1d7f7-4fcf-4b7d-8d87-38a60126462f` - The combination of `platformId`, `channelId` and `advertisingId` does not exist
-             * `409d70bf-376e-4a21-a8d0-f75a4a6a7abc` - There is no price entry found for the combination of `platformId`, `channelId`, `advertisingId`, `tarifId`, `extraPriceLevelId` and `priceTypeId` does not exist
-        '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+    /app-api/campaign/{campaignExternalId}/flight:
+        post:
+            tags: [CampaignFlight]
+            summary: Create a new flight
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+                -  in: query
+                   name: update_commissions
+                   schema:
+                       type: boolean
+                       default: 0
+                       enum: [ 0, 1 ]
+                   description: >
+                       Whether to update commissions or not. **Particular**: if the campaign was created or updated with update_commissions: 1, then the commission will be used even if a flight is created with update_commissions: 0
+                        * **0**: Use the commission as configured on the campaign. 
+                        * **1**: Commissions will be updated for this flight.
 
-  /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}:
-    get:
-      tags: [CampaignFlight]
-      summary: Retrieve the flight by its external ID
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
-      responses:
-        '200':
-          description: Return the campaign data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FlightRead'
-        '404':
-          description: Flight has not been found
-    post:
-      tags: [CampaignFlight]
-      summary: Update the flight by its external ID. All the properties are optional, only the supplied properties are changed.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FlightUpdate'
-      responses:
-        '204':
-          description: Flight has been updated
-        '404':
-          description: The campaign does not exist
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-             * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `platformId`
-               in the customer object could not be found), here you have to refer to the `propertyPath` value to
-               find out which property caused the error
-             * `e3a1d7f7-4fcf-4b7d-8d87-38a60126462f` - The combination of `platformId`, `channelId` and `advertisingId` does not exist
-             * `409d70bf-376e-4a21-a8d0-f75a4a6a7abc` - There is no price entry found for the combination of `platformId`, `channelId`, `advertisingId`, `tarifId`, `extraPriceLevelId` and `priceTypeId` does not exist
-             * `24a9375a-0b22-4676-9a29-9c9e7f2c195f` - The adServerId provided in the KeyValueSet is invalid
-        '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
-    delete:
-      tags: [ CampaignFlight ]
-      summary: Delete the flight by its external ID
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
-      responses:
-        '204':
-          description: Flight has been deleted
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-            
-            
-            Campaign errors:
-               * `60e2547e-bac4-4738-bcfc-6b38fa847a16` - Delete failed because campaign is already archived.
-               * `1b97b080-933c-40df-8768-e08473736005` - Campaign does not have the status 'reservation' and therefore flights cannot be deleted.
-            
-            
-            Flight errors:  
-               * `cc8b37d1-8c9f-491e-aaf4-05510935b492` - Delete failed because flight is already invoiced.
-               * `ac23616c-a625-47b4-9e58-909c66df5f6d` - Flight already has ad server data and therefore cannot be deleted.
-               * `8665dee6-e755-4904-9df4-93ef5bd64d29` - Flight already has deferred data and therefore cannot be deleted.
-               * `33042bd6-05f3-4691-ba27-4f5cef93f697` - Flight already has publisher payouts and therefore cannot be deleted.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ConstraintViolationResponse'
-        '404':
-          description: Flight has not been found
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/FlightCreate'
+            responses:
+                '201':
+                    description: Flight has been created
+                '404':
+                    description: The campaign does not exist
+                '400':
+                    description: >
+                        Returns a list of errors in the input data. For this call the following violation codes can be expected
+                         * `1f06b2d7-49b4-4b8b-aa66-5172aeb01e97` - The externalId is already in use
+                         * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `platformId`
+                           in the customer object could not be found), here you have to refer to the `propertyPath` value to
+                           find out which property caused the error
+                         * `e3a1d7f7-4fcf-4b7d-8d87-38a60126462f` - The combination of `platformId`, `channelId` and `advertisingId` does not exist
+                         * `409d70bf-376e-4a21-a8d0-f75a4a6a7abc` - There is no price entry found for the combination of `platformId`, `channelId`, `advertisingId`, `tarifId`, `extraPriceLevelId` and `priceTypeId` does not exist
+                '500':
+                    description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
+
+    /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}:
+        get:
+            tags: [CampaignFlight]
+            summary: Retrieve the flight by its external ID
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+                - in: path
+                  name: flightExternalId
+                  schema:
+                      type: string
+                  required: true
+            responses:
+                '200':
+                    description: Return the campaign data
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FlightRead'
+                '404':
+                    description: Flight has not been found
+        post:
+            tags: [CampaignFlight]
+            summary: Update the flight by its external ID. All the properties are optional, only the supplied properties are changed.
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+                - in: path
+                  name: flightExternalId
+                  schema:
+                      type: string
+                  required: true
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/FlightUpdate'
+            responses:
+                '204':
+                    description: Flight has been updated
+                '404':
+                    description: The campaign does not exist
+                '400':
+                    description: >
+                        Returns a list of errors in the input data. For this call the following violation codes can be expected
+                         * `5658b9ca-ce50-4a98-a0da-97d9361845e3` - An invalid ID field has been given (for example the `platformId`
+                           in the customer object could not be found), here you have to refer to the `propertyPath` value to
+                           find out which property caused the error
+                         * `e3a1d7f7-4fcf-4b7d-8d87-38a60126462f` - The combination of `platformId`, `channelId` and `advertisingId` does not exist
+                         * `409d70bf-376e-4a21-a8d0-f75a4a6a7abc` - There is no price entry found for the combination of `platformId`, `channelId`, `advertisingId`, `tarifId`, `extraPriceLevelId` and `priceTypeId` does not exist
+                         * `24a9375a-0b22-4676-9a29-9c9e7f2c195f` - The adServerId provided in the KeyValueSet is invalid
+                '500':
+                    description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
+        delete:
+            tags: [ CampaignFlight ]
+            summary: Delete the flight by its external ID
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+                - in: path
+                  name: flightExternalId
+                  schema:
+                      type: string
+                  required: true
+            responses:
+                '204':
+                    description: Flight has been deleted
+                '400':
+                    description: >
+                        Returns a list of errors in the input data. For this call the following violation codes can be expected
+                        
+                        
+                        Campaign errors:
+                           * `60e2547e-bac4-4738-bcfc-6b38fa847a16` - Delete failed because campaign is already archived.
+                           * `1b97b080-933c-40df-8768-e08473736005` - Campaign does not have the status 'reservation' and therefore flights cannot be deleted.
+                        
+                        
+                        Flight errors:  
+                           * `cc8b37d1-8c9f-491e-aaf4-05510935b492` - Delete failed because flight is already invoiced.
+                           * `ac23616c-a625-47b4-9e58-909c66df5f6d` - Flight already has ad server data and therefore cannot be deleted.
+                           * `8665dee6-e755-4904-9df4-93ef5bd64d29` - Flight already has deferred data and therefore cannot be deleted.
+                           * `33042bd6-05f3-4691-ba27-4f5cef93f697` - Flight already has publisher payouts and therefore cannot be deleted.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ConstraintViolationResponse'
+                '404':
+                    description: Flight has not been found
 
 
-  /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/sublines:
-    get:
-      tags: [CampaignFlightSubline]
-      summary: Retrieve the flight's sublines by its external ID. This endpoint only available if the marketer network module is active.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
-      responses:
-        '200':
-          description: Return the campaign data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FlightSublines'
+    /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/sublines:
+        get:
+            tags: [CampaignFlightSubline]
+            summary: Retrieve the flight's sublines by its external ID. This endpoint only available if the marketer network module is active.
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+                - in: path
+                  name: flightExternalId
+                  schema:
+                      type: string
+                  required: true
+            responses:
+                '200':
+                    description: Return the campaign data
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FlightSublines'
 
-        '404':
-          description: Flight has not been found
-    post:
-      tags: [CampaignFlightSubline]
-      summary: Create/Update the sublines for a flight. This endpoint only available if the marketer network module is active.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FlightSublines'
-      responses:
-        '204':
-          description: Sublines have been updated
-        '404':
-          description: The campaign or flight does not exist
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-             * `d368a263-4bd7-4f21-bccf-1188df46991c` - The `platformId` of the given subline does not belong to the network defined in the flight's `platformId`.
-             * `3b254c3d-590c-4edc-b763-c49f5a703355` - The `percentage` values of all `sublines` do not add up to 100%
-        '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+                '404':
+                    description: Flight has not been found
+        post:
+            tags: [CampaignFlightSubline]
+            summary: Create/Update the sublines for a flight. This endpoint only available if the marketer network module is active.
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+                - in: path
+                  name: flightExternalId
+                  schema:
+                      type: string
+                  required: true
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/FlightSublines'
+            responses:
+                '204':
+                    description: Sublines have been updated
+                '404':
+                    description: The campaign or flight does not exist
+                '400':
+                    description: >
+                        Returns a list of errors in the input data. For this call the following violation codes can be expected
+                         * `d368a263-4bd7-4f21-bccf-1188df46991c` - The `platformId` of the given subline does not belong to the network defined in the flight's `platformId`.
+                         * `3b254c3d-590c-4edc-b763-c49f5a703355` - The `percentage` values of all `sublines` do not add up to 100%
+                '500':
+                    description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
 
-  /app-api/campaign/{campaignExternalId}/document:
-    post:
-      tags: [Campaign]
-      summary: Create a new campaign document for an existing campaign.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Document'
-      responses:
-        '201':
-          description: Document has been created
-        '404':
-          description: The campaign does not exist
+    /app-api/campaign/{campaignExternalId}/document:
+        post:
+            tags: [Campaign]
+            summary: Create a new campaign document for an existing campaign.
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Document'
+            responses:
+                '201':
+                    description: Document has been created
+                '404':
+                    description: The campaign does not exist
 
-  /app-api/campaign/{campaignExternalId}/archive-status:
-    post:
-      tags: [Campaign]
-      summary: Set archive status of a campaign
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ArchiveStatus'
-      responses:
-        '204':
-          description: Archive status was updated successfully
-        '404':
-          description: The campaign does not exist
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-            * `28a27691-46f0-4bc2-9806-100587d7a962` - The campaign was already billed, cannot archive / unarchive
-            * `e0a1561a-631e-4d1b-99fe-6a7e7f89b4dd` - The campaign was partially invoiced, cannot archive
-        '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+    /app-api/campaign/{campaignExternalId}/archive-status:
+        post:
+            tags: [Campaign]
+            summary: Set archive status of a campaign
+            parameters:
+                - in: path
+                  name: campaignExternalId
+                  schema:
+                      type: string
+                  required: true
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ArchiveStatus'
+            responses:
+                '204':
+                    description: Archive status was updated successfully
+                '404':
+                    description: The campaign does not exist
+                '400':
+                    description: >
+                        Returns a list of errors in the input data. For this call the following violation codes can be expected
+                        * `28a27691-46f0-4bc2-9806-100587d7a962` - The campaign was already billed, cannot archive / unarchive
+                        * `e0a1561a-631e-4d1b-99fe-6a7e7f89b4dd` - The campaign was partially invoiced, cannot archive
+                '500':
+                    description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
 
-  /app-api/crm-sync-import-external-crm-id/update-customer:
-    post:
-      tags: [Customer]
-      summary: Create or update (Upsert) a customer with addresses and contact persons
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Customer'
-      responses:
-        '200':
-          description: Customer was created / updated
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/UpdateCustomerResponse'
-                  - type: object
-                    properties:
-                      errorLogs:
-                        type: object
-                        example: null
+    /app-api/crm-sync-import-external-crm-id/update-customer:
+        post:
+            tags: [Customer]
+            summary: Create or update (Upsert) a customer with addresses and contact persons
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Customer'
+            responses:
+                '200':
+                    description: Customer was created / updated
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: '#/components/schemas/UpdateCustomerResponse'
+                                    - type: object
+                                      properties:
+                                          errorLogs:
+                                              type: object
+                                              example: null
 
-        '202':
-          description: Customer has not been processed yet (check /error-logs/ endpoint for status)
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - type: object
-                    properties:
-                      jobId:
-                        example: 123
-                      jobAlreadyFinished:
-                        example: false
-                      reason:
-                        example: blocking_timeout
+                '202':
+                    description: Customer has not been processed yet (check /error-logs/ endpoint for status)
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - type: object
+                                      properties:
+                                          jobId:
+                                              example: 123
+                                          jobAlreadyFinished:
+                                              example: false
+                                          reason:
+                                              example: blocking_timeout
 
-        '400':
-          description: There was an issue with updating the customer
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/UpdateCustomerResponse"
-                  - type: object
-                    properties:
-                      error:
-                        type: object
-                        properties:
-                          msg:
-                            description: If the customer data fails validation before further processing e.g. is more severely badly formatted like no data or customer sent at all or invalid JSON format.
-                            type: string
-                            example: Request had no body
-                      reason:
-                        description: Indication of what is the status of the processed job.  'data_error' means there was an error when processing data, please check logs. 'blocking_timeout' means job couldn't be processed before returning response. 'blocking_buried' and 'queue_internal' are more severe internal errors.
-                        enum: ['data_error', 'blocking_timeout','blocking_buried','queue_internal']
-                        type: string
-                        example: 'data_error'
+                '400':
+                    description: There was an issue with updating the customer
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/UpdateCustomerResponse"
+                                    - type: object
+                                      properties:
+                                          error:
+                                              type: object
+                                              properties:
+                                                  msg:
+                                                      description: If the customer data fails validation before further processing e.g. is more severely badly formatted like no data or customer sent at all or invalid JSON format.
+                                                      type: string
+                                                      example: Request had no body
+                                          reason:
+                                              description: Indication of what is the status of the processed job.  'data_error' means there was an error when processing data, please check logs. 'blocking_timeout' means job couldn't be processed before returning response. 'blocking_buried' and 'queue_internal' are more severe internal errors.
+                                              enum: ['data_error', 'blocking_timeout','blocking_buried','queue_internal']
+                                              type: string
+                                              example: 'data_error'
 
-  /app-api/crm-sync-import-external-crm-id/error-logs/{jobId}:
-    get:
-      tags: [Customer]
-      summary: Read customer logs to see the current status of processing
-      parameters:
-        - in: path
-          name: jobId
-          schema:
-            type: integer
-          required: true
-      responses:
-        '200':
-          description: If there are found logs they have been returned
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CustomerErrorLogResponse'
-        '404':
-          description: No job found for this jobId.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CustomerErrorLogResponse'
+    /app-api/crm-sync-import-external-crm-id/error-logs/{jobId}:
+        get:
+            tags: [Customer]
+            summary: Read customer logs to see the current status of processing
+            parameters:
+                - in: path
+                  name: jobId
+                  schema:
+                      type: integer
+                  required: true
+            responses:
+                '200':
+                    description: If there are found logs they have been returned
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CustomerErrorLogResponse'
+                '404':
+                    description: No job found for this jobId.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CustomerErrorLogResponse'
 
-  /app-api/graph-export/download/{savedReportId}:
-    get:
-      tags: [GraphReport]
-      summary: Download graph report as csv. Careful - custom reports must be retrieved via other endpoint.
-      description: >
-        Useful links
-          * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
-          * [Php example code graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
+    /app-api/graph-export/download/{savedReportId}:
+        get:
+            tags: [GraphReport]
+            summary: Download graph report as csv. Careful - custom reports must be retrieved via other endpoint.
+            description: >
+                Useful links
+                  * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
+                  * [Php example code graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
 
-      parameters:
-        - in: path
-          name: savedReportId
-          description: >
-            You get this report ID by saving a graph report. For example:
-             1. Go to [https://example.com/statistic/graph-report/show](https://example.com/statistic/graph-report/show), enter a name for the report and press save.
-             2. Read out the resulting `savedReportId` in the following page e.g. `https://example.com/statistic/graph-report/saved/46` where 46 is the `savedReportId`
-             3. Use the `savedReportId` to call this endpoint with e.g. `/app-api/graph-export/download/46`
+            parameters:
+                - in: path
+                  name: savedReportId
+                  description: >
+                      You get this report ID by saving a graph report. For example:
+                       1. Go to [https://example.com/statistic/graph-report/show](https://example.com/statistic/graph-report/show), enter a name for the report and press save.
+                       2. Read out the resulting `savedReportId` in the following page e.g. `https://example.com/statistic/graph-report/saved/46` where 46 is the `savedReportId`
+                       3. Use the `savedReportId` to call this endpoint with e.g. `/app-api/graph-export/download/46`
 
-          schema:
-            type: integer
-          required: true
-      responses:
-        '200':
-          description: The report as csv file
-          content:
-            text/csv; charset=UTF-8: {}
-        '404':
-          description:
-            The report was not found. Did you save it and was it really a CustomReport (not GraphReport)? Correct environment test, staging or production?
-          content:
-            text/html; charset=UTF-8: {}
-        '500':
-          description: Reason maybe you tried to retrieve a custom report mistakenly over this endpoint instead of the other
-          content:
-            text/html; charset=UTF-8: {}
+                  schema:
+                      type: integer
+                  required: true
+            responses:
+                '200':
+                    description: The report as csv file
+                    content:
+                        text/csv; charset=UTF-8: {}
+                '404':
+                    description:
+                        The report was not found. Did you save it and was it really a CustomReport (not GraphReport)? Correct environment test, staging or production?
+                    content:
+                        text/html; charset=UTF-8: {}
+                '500':
+                    description: Reason maybe you tried to retrieve a custom report mistakenly over this endpoint instead of the other
+                    content:
+                        text/html; charset=UTF-8: {}
 
-  /app-api/custom-report-export/download/{savedReportId}:
-    get:
-      tags: [GraphReport]
-      summary: Download custom graph report as csv. Careful - normal graph reports must be retrieved via other endpoint.
-      description: >
-        * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
-        * [Php example code custom graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
-      parameters:
-        - in: path
-          name: savedReportId
-          description: >
-            You get this report ID by saving a graph report. For example:
-             1. Go to [https://example.com/statistic/customreport](https://example.com/statistic/customreport), enter a name for the report and press save.
-             2. Read out the resulting `savedReportId` in the following page e.g. `https://example.com/statistic/customreport?saved_report_id=47` where 47 is the `savedReportId`
-             3. Use the `savedReportId` to call this endpoint with e.g. `/app-api/custom-report-export/download/47`
-          schema:
-            type: integer
-          required: true
-      responses:
-        '200':
-          description: The report as csv file
-          content:
-            text/csv; charset=UTF-8: {}
-        '404':
-          description:
-            The report was not found. Did you save it and was it really a CustomReport (not GraphReport)? Correct environment test, staging or production?
-          content:
-            text/html; charset=UTF-8: {}
+    /app-api/custom-report-export/download/{savedReportId}:
+        get:
+            tags: [GraphReport]
+            summary: Download custom graph report as csv. Careful - normal graph reports must be retrieved via other endpoint.
+            description: >
+                * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
+                * [Php example code custom graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
+            parameters:
+                - in: path
+                  name: savedReportId
+                  description: >
+                      You get this report ID by saving a graph report. For example:
+                       1. Go to [https://example.com/statistic/customreport](https://example.com/statistic/customreport), enter a name for the report and press save.
+                       2. Read out the resulting `savedReportId` in the following page e.g. `https://example.com/statistic/customreport?saved_report_id=47` where 47 is the `savedReportId`
+                       3. Use the `savedReportId` to call this endpoint with e.g. `/app-api/custom-report-export/download/47`
+                  schema:
+                      type: integer
+                  required: true
+            responses:
+                '200':
+                    description: The report as csv file
+                    content:
+                        text/csv; charset=UTF-8: {}
+                '404':
+                    description:
+                        The report was not found. Did you save it and was it really a CustomReport (not GraphReport)? Correct environment test, staging or production?
+                    content:
+                        text/html; charset=UTF-8: {}
 
 components:
-  parameters:
-      updateCommissionsParameter:
-          in: query
-          name: update_commissions
-          schema:
-              type: boolean
-              default: 0
-              enum: [ 0, 1 ]
-          description: Whether to apply the commissions or not
-      updateCustomerDiscounts:
-          in: query
-          name: update_customer_discounts
-          schema:
-              type: boolean
-              default: 0
-              enum: [ 0, 1 ]
-          description: Whether to apply the customer discounts or not
+    parameters:
+        updateCustomerDiscounts:
+            in: query
+            name: update_customer_discounts
+            schema:
+                type: boolean
+                default: 0
+                enum: [ 0, 1 ]
+            description: Whether to apply the customer discounts or not
 
-  schemas:
-    Campaign:
-      description: A goTom campaign
-      type: object
-      properties:
-        name:
-          description: Corresponds with the field "Kampagne"
-          type: string
-        status:
-          description: Corresponds with the field "Status"
-          type: string
-          default: booking
-          enum: [booking, reservation]
-        bookingDate:
-          description: Corresponds with the field "Buchungsdatum"
-          type: string
-          format: date
-        campaignTypeId:
-          description: Corresponds with the field "Kampagnentyp"
-          type: integer
-          example: 1
-        campaignTypeReference:
-          description: Corresponds with the field "Kampagnentyp Referenz"
-          type: string
-        customer:
-          description: Corresponds with the field "Kunde"
-          allOf:
-            - $ref: "#/components/schemas/ContactRef"
-        intermediator:
-          description: Corresponds with the field "Vermittler"
-          allOf:
-            - $ref: "#/components/schemas/ContactRef"
-        agency:
-          description: Corresponds with the field "Agentur"
-          allOf:
-            - $ref: "#/components/schemas/ContactRef"
-        note:
-          description: Corresponds with the Field "Bemerkungen"
-          type: string
-        noteInternal:
-          description: Corresponds with the Field "Interne Bemerkungen"
-          type: string
-        noteReservation:
-          description: Corresponds with the Field "Reservationsabklärung"
-          type: string
+    schemas:
+        Campaign:
+            description: A goTom campaign
+            type: object
+            properties:
+                name:
+                    description: Corresponds with the field "Kampagne"
+                    type: string
+                status:
+                    description: Corresponds with the field "Status"
+                    type: string
+                    default: booking
+                    enum: [booking, reservation]
+                bookingDate:
+                    description: Corresponds with the field "Buchungsdatum"
+                    type: string
+                    format: date
+                campaignTypeId:
+                    description: Corresponds with the field "Kampagnentyp"
+                    type: integer
+                    example: 1
+                campaignTypeReference:
+                    description: Corresponds with the field "Kampagnentyp Referenz"
+                    type: string
+                customer:
+                    description: Corresponds with the field "Kunde"
+                    allOf:
+                        - $ref: "#/components/schemas/ContactRef"
+                intermediator:
+                    description: Corresponds with the field "Vermittler"
+                    allOf:
+                        - $ref: "#/components/schemas/ContactRef"
+                agency:
+                    description: Corresponds with the field "Agentur"
+                    allOf:
+                        - $ref: "#/components/schemas/ContactRef"
+                note:
+                    description: Corresponds with the Field "Bemerkungen"
+                    type: string
+                noteInternal:
+                    description: Corresponds with the Field "Interne Bemerkungen"
+                    type: string
+                noteReservation:
+                    description: Corresponds with the Field "Reservationsabklärung"
+                    type: string
 
-    CampaignUpdate:
-      allOf:
-        - $ref: "#/components/schemas/Campaign"
-        - $ref: "#/components/schemas/CampaignSalesMixin"
+        CampaignUpdate:
+            allOf:
+                - $ref: "#/components/schemas/Campaign"
+                - $ref: "#/components/schemas/CampaignSalesMixin"
 
-    FlightUpdate:
-      allOf:
-        - $ref: "#/components/schemas/Flight"
-        - type: object
-          properties:
-            adServerPushChanges:
-              type: object
-              properties:
-                adServerId:
-                  type: string
-                types:
-                  type: array
-                  items:
+        FlightUpdate:
+            allOf:
+                - $ref: "#/components/schemas/Flight"
+                - type: object
+                  properties:
+                      adServerPushChanges:
+                          type: object
+                          properties:
+                              adServerId:
+                                  type: string
+                              types:
+                                  type: array
+                                  items:
+                                      type: string
+                                      enum:
+                                          - runtime
+                                          - units
+                                          - other
+                                          - placements
+                              remarks:
+                                  type: string
+
+        CampaignCreate:
+            required:
+                - externalId
+                - status
+                - bookingDate
+                - customer
+            allOf:
+                - $ref: "#/components/schemas/Campaign"
+                - $ref: "#/components/schemas/CampaignSalesMixin"
+                - type: object
+                  properties:
+                      externalId:
+                          type: string
+                      currency:
+                          description: Corresponds with the field "Währung". Currency of the campaign (the instance default is used if none is supplied)
+                          type: string
+
+        CampaignRead:
+            allOf:
+                - $ref: "#/components/schemas/CampaignCreate"
+                - type: object
+                  properties:
+                      campaignId:
+                          type: integer
+                          description: goTom ID of the Campaign (Sometimes known as Booking ID)
+
+                      salesSupportId:
+                          nullable: true
+                          description: Correspons with the field "Innendienst"
+                          type: integer
+                          example: 42
+
+                      salesSupportEmail:
+                          nullable: true
+                          description: E-Mail of the sales support user ("Innendienst")
+                          type: string
+                          example: sales-support@acme-corp.ch
+
+                      salesId:
+                          nullable: true
+                          description: Corresponds with the field "Verkauf"
+                          type: integer
+                          example: 23
+
+                      salesEmail:
+                          nullable: true
+                          description: E-Mail of the sales user ("Verkauf")
+                          type: string
+                          example: sales@acme-corp.ch
+
+                      campaignTypeId:
+                          nullable: true
+                          description: goTom ID of the Campaign Type on the Campaign
+                          type: integer
+                          example: 1
+
+                      campaignTypeReference:
+                          nullable: true
+                          description: Reference for Campaign Type
+                          type: string
+
+                      flights:
+                          type: array
+                          items:
+                              $ref: "#/components/schemas/FlightRead"
+
+        CrmSyncErrorLogsMixin:
+            description: used internally to keep DRY
+            type: object
+            properties:
+                errorLogs:
+                    type: object
+                    nullable: true
+                    properties:
+                        api_error:
+                            description: The logs that show what lead to an error when processing the request e.g. missing externalCrmId on data.
+                            type: string
+                            example: Class AppBundle\Entity\CustomerAddress expects the key externalCrmId to be present in data. Only "title,firm,softDeleted,externalId" received
+                warningLogs:
+                    description: The log that shows what lead to a warning when processing the request e.g. providing not all possible fields with their values or providing fields with values that are not configured and thus not read.
+                    nullable: true
+                    type: array
+                    example: ['Data key contacts provided for type AppBundle\Entity\Customer, but is not a configured attribute. contacts will be ignored. Let the client know, that this attribute should be removed from his request.','Data key id not provided for type AppBundle\Entity\Customer, but is a configured attribute. Did the client forget to send it?']
+                    items:
+                        type: string
+
+        CampaignSalesMixin:
+            anyOf:
+                - oneOf:
+                      - type: object
+                        properties:
+                            salesSupportId:
+                                description: Correspons with the field "Innendienst"
+                                type: integer
+                                example: 42
+                      - type: object
+                        properties:
+                            salesSupportEmail:
+                                description: Correspons with the field "Innendienst"
+                                type: string
+                                example: sales-support@acme-corp.ch
+                - oneOf:
+                      - type: object
+                        properties:
+                            salesId:
+                                description: Corresponds with the field "Verkauf"
+                                type: integer
+                                example: 23
+                      - type: object
+                        properties:
+                            salesEmail:
+                                description: Corresponds with the field "Verkauf"
+                                type: string
+                                example: sales-support@acme-corp.ch
+
+        Flight:
+            description: A goTom Flight
+            type: object
+            properties:
+                runtime:
+                    type: object
+                    description: Start and Enddate of the flight
+                    properties:
+                        start:
+                            type: object
+                            allOf:
+                                - $ref: "#/components/schemas/DateTimeComponents"
+                        end:
+                            type: object
+                            allOf:
+                                - $ref: "#/components/schemas/DateTimeComponents"
+
+                tarifId:
+                    description: Corresponds with the field "Tarif"
+                    type: integer
+                mediaId:
+                    description: Corresponds with the field "Medium"
+                    type: integer
+                extraPriceLevelId:
+                    description: Corresponds with the field "Extra Preis Ebene"
+                    type: integer
+
+                platformId:
+                    description: Corresponds with the field "Platform"
+                    type: integer
+
+                channelId:
+                    description: Corresponds with the field "Channel"
+                    type: integer
+
+                advertisingId:
+                    description: Corresponds with the field "Werbemittel"
+                    type: integer
+
+                priceTypeId:
+                    description: Corresponds with the field "Preistyp"
+                    type: integer
+
+                units:
+                    description: Corresponds with the field "Anzahl Einheiten"
+                    type: integer
+
+                bruttoPriceUnit:
+                    description: |
+                        Corresponds with the field "Finaler Bruttopreis Einheit". 
+                        Can be a number (ie 15.20), or the string "loadFromRate" (will autoload the price from the rate sheet). 
+                        Can be omitted when updating a flight (existing bruttoPriceUnit will stay the same)
+                    oneOf:
+                        - type: string
+                        - type: number
+
+                advertisingStatus:
+                    description: Corresponds with the field "WM Status"
                     type: string
                     enum:
-                      - runtime
-                      - units
-                      - other
-                      - placements
-                remarks:
-                  type: string
+                        - open
+                        - received
+                        - integrated
 
-    CampaignCreate:
-      required:
-        - externalId
-        - status
-        - bookingDate
-        - customer
-      allOf:
-        - $ref: "#/components/schemas/Campaign"
-        - $ref: "#/components/schemas/CampaignSalesMixin"
-        - type: object
-          properties:
-            externalId:
-              type: string
-            currency:
-              description: Corresponds with the field "Währung". Currency of the campaign (the instance default is used if none is supplied)
-              type: string
-
-    CampaignRead:
-      allOf:
-        - $ref: "#/components/schemas/CampaignCreate"
-        - type: object
-          properties:
-            campaignId:
-              type: integer
-              description: goTom ID of the Campaign (Sometimes known as Booking ID)
-
-            salesSupportId:
-              nullable: true
-              description: Correspons with the field "Innendienst"
-              type: integer
-              example: 42
-
-            salesSupportEmail:
-              nullable: true
-              description: E-Mail of the sales support user ("Innendienst")
-              type: string
-              example: sales-support@acme-corp.ch
-
-            salesId:
-              nullable: true
-              description: Corresponds with the field "Verkauf"
-              type: integer
-              example: 23
-
-            salesEmail:
-              nullable: true
-              description: E-Mail of the sales user ("Verkauf")
-              type: string
-              example: sales@acme-corp.ch
-
-            campaignTypeId:
-              nullable: true
-              description: goTom ID of the Campaign Type on the Campaign
-              type: integer
-              example: 1
-
-            campaignTypeReference:
-              nullable: true
-              description: Reference for Campaign Type
-              type: string
-
-            flights:
-              type: array
-              items:
-                $ref: "#/components/schemas/FlightRead"
-
-    CrmSyncErrorLogsMixin:
-      description: used internally to keep DRY
-      type: object
-      properties:
-        errorLogs:
-          type: object
-          nullable: true
-          properties:
-            api_error:
-              description: The logs that show what lead to an error when processing the request e.g. missing externalCrmId on data.
-              type: string
-              example: Class AppBundle\Entity\CustomerAddress expects the key externalCrmId to be present in data. Only "title,firm,softDeleted,externalId" received
-        warningLogs:
-          description: The log that shows what lead to a warning when processing the request e.g. providing not all possible fields with their values or providing fields with values that are not configured and thus not read.
-          nullable: true
-          type: array
-          example: ['Data key contacts provided for type AppBundle\Entity\Customer, but is not a configured attribute. contacts will be ignored. Let the client know, that this attribute should be removed from his request.','Data key id not provided for type AppBundle\Entity\Customer, but is a configured attribute. Did the client forget to send it?']
-          items:
-            type: string
-
-    CampaignSalesMixin:
-      anyOf:
-        - oneOf:
-            - type: object
-              properties:
-                salesSupportId:
-                  description: Correspons with the field "Innendienst"
-                  type: integer
-                  example: 42
-            - type: object
-              properties:
-                salesSupportEmail:
-                  description: Correspons with the field "Innendienst"
-                  type: string
-                  example: sales-support@acme-corp.ch
-        - oneOf:
-            - type: object
-              properties:
-                salesId:
-                  description: Corresponds with the field "Verkauf"
-                  type: integer
-                  example: 23
-            - type: object
-              properties:
-                salesEmail:
-                  description: Corresponds with the field "Verkauf"
-                  type: string
-                  example: sales-support@acme-corp.ch
-
-    Flight:
-      description: A goTom Flight
-      type: object
-      properties:
-        runtime:
-          type: object
-          description: Start and Enddate of the flight
-          properties:
-            start:
-              type: object
-              allOf:
-                - $ref: "#/components/schemas/DateTimeComponents"
-            end:
-              type: object
-              allOf:
-                - $ref: "#/components/schemas/DateTimeComponents"
-
-        tarifId:
-          description: Corresponds with the field "Tarif"
-          type: integer
-        mediaId:
-          description: Corresponds with the field "Medium"
-          type: integer
-        extraPriceLevelId:
-          description: Corresponds with the field "Extra Preis Ebene"
-          type: integer
-
-        platformId:
-          description: Corresponds with the field "Platform"
-          type: integer
-
-        channelId:
-          description: Corresponds with the field "Channel"
-          type: integer
-
-        advertisingId:
-          description: Corresponds with the field "Werbemittel"
-          type: integer
-
-        priceTypeId:
-          description: Corresponds with the field "Preistyp"
-          type: integer
-
-        units:
-          description: Corresponds with the field "Anzahl Einheiten"
-          type: integer
-
-        bruttoPriceUnit:
-          description: |
-            Corresponds with the field "Finaler Bruttopreis Einheit". 
-            Can be a number (ie 15.20), or the string "loadFromRate" (will autoload the price from the rate sheet). 
-            Can be omitted when updating a flight (existing bruttoPriceUnit will stay the same)
-          oneOf:
-            - type: string
-            - type: number
-
-        advertisingStatus:
-          description: Corresponds with the field "WM Status"
-          type: string
-          enum:
-            - open
-            - received
-            - integrated
-
-        note:
-          description: Corresponds with the field "Bemerkungen"
-          type: string
-
-        noteInternal:
-          description: Corresponds with the field "Interne Bemerkungen"
-          type: string
-
-        noteBilling:
-          description: Corresponds with the field "Faktura Bemerkungen"
-          type: string
-
-        adServerId:
-          description: Corresponds with the field "AdServer"
-          type: string
-
-        keyValueSets:
-          description: Corresponds with the field "Targeting Configuration -> Key / Values"
-          type: array
-          items:
-            $ref: '#/components/schemas/KeyValueSet'
-
-        geoTargetingByZip:
-          description: Corresponds with the field "Targeting Configuration -> Geo Targeting -> PLZ"
-          type: object
-          properties:
-            countryId:
-              type: string
-              enum:
-                - US
-                - CA
-                - DE
-                - FR
-                - GB
-                - IN
-            zipCodes:
-              description: Comma separated list of zip codes
-              type: string
-
-    FlightCreate:
-      required:
-        - externalId
-        - adServerId
-        - runtime
-        - tarifId
-        - mediaId
-        - platformId
-        - channelId
-        - advertisingId
-        - priceTypeId
-        - units
-        - bruttoPriceUnit
-      allOf:
-        - $ref: "#/components/schemas/Flight"
-        - type: object
-          properties:
-            externalId:
-              type: string
-
-    FlightRead:
-      allOf:
-        - $ref: "#/components/schemas/FlightCreate"
-
-    FlightSublines:
-      description: Represents the sublines for a flight (only for network flights)
-      type: object
-      properties:
-        sublines:
-          type: array
-          items:
-            properties:
-              platformId:
-                description: Platform of the network
-                type: integer
-              percentage:
-                description: Share of the platform in percent (42.5% = 42.5).
-                example: 42.5
-                type: number
-
-    UpdateCustomerResponse:
-      description: Response for successful, failed and unfinished costumer update jobs.
-      type: object
-      properties:
-        jobId:
-          description: The job id. Currently this id can reset upon reboot of the server e.g. is not necessarily unique.
-          type: integer
-          example: 123
-        jobAlreadyFinished:
-          description: Whether or not the job was able to return synchronously e.g. if true means the job was processed before the response was returned and thus the logs are returned as well in the response. False means the job still awaits processing.
-          type: boolean
-          example: true
-      allOf:
-        - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
-
-    CustomerErrorLogResponse:
-      description: The logs available when retrieving the customer
-      type: object
-      properties:
-        jobStatus:
-          description: The status of the job in the queue, where JOB_STATUS_FINISHED_OK means all ok
-          enum: ['NO_JOB_FOUND', 'JOB_STATUS_WAITING', 'JOB_STATUS_FINISHED_OK', 'JOB_STATUS_FINISHED_ERROR']
-          type: string
-        sentJobId:
-          description: job Id sent by you.
-          type: integer
-          example: 12
-      allOf:
-        - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
-
-    ContactRef:
-      description: This entity represents either a customer, agency, intermediator or publisher, either the external ID or the external CRM ID or the goTom ID can be set
-      type: object
-      nullable: true
-      properties:
-        entityId:
-          description: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
-          type: integer
-        entityExternalId:
-          description: External ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
-          type: string
-        entityExternalCrmId:
-          description: External CRM ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
-          type: string
-        addressId:
-          description: ID of the address for this contact (corresponds to the "Adresse" field in the UI)
-          type: integer
-          nullable: true
-        addressExternalId:
-          description: External ID of the address for this contact (corresponds to the "Adresse" field in the UI)
-          type: string
-          nullable: true
-        addressExternalCrmId:
-          description: External CRM ID of the address for this contact (corresponds to the "Adresse" field in the UI)
-          type: string
-          nullable: true
-        personId:
-          description: ID of the person for this contact (corresponds to the "Kontakt" field)
-          type: integer
-          nullable: true
-        personExternalId:
-          description: External ID of the person for this contact (corresponds to the "Kontakt" field)
-          type: string
-          nullable: true
-        personExternalCrmId:
-          description: External CRM ID of the person for this contact (corresponds to the "Kontakt" field)
-          type: string
-          nullable: true
-
-    DateTimeComponents:
-      description: Represents date and time (timezone is implicitly always the "system timezone" of goTom)
-      required:
-        - date
-      properties:
-        date:
-          type: string
-          format: date
-        time:
-          description: Time without seconds in the format HH:MM
-          type: string
-          example: 12:34
-          pattern: '^\d{2}:\d{2}$'
-
-    AnyValue:
-      description: Can be any value - string, number, boolean, array or object.
-      nullable: true
-      anyOf:
-        - type: string
-        - type: number
-        - type: integer
-        - type: boolean
-        - type: array
-          items: {}
-        - type: object
-
-    InternalServerErrorResponse:
-      properties:
-        message:
-          type: string
-          example: Internal Server Error
-
-    ConstraintViolationResponse:
-      properties:
-        errors:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConstraintViolationItem'
-
-    ConstraintViolationItem:
-      properties:
-        propertyPath:
-          type: string
-        message:
-          type: string
-        invalidValue:
-          $ref: '#/components/schemas/AnyValue'
-        cause:
-          $ref: '#/components/schemas/AnyValue'
-        code:
-          type: string
-
-    Document:
-      properties:
-        name:
-          type: string
-          example: Test.pdf
-        content:
-          type: string
-          format: byte
-          description: base64 encoded file content
-
-    ArchiveStatus:
-      properties:
-        setIsArchived:
-          type: boolean
-          example: true
-          description: true to archive, false to un-archive / activate
-
-    KeyValueSet:
-      properties:
-        adServerId:
-          type: string
-        keyValues:
-          type: array
-          items:
-            $ref: '#/components/schemas/KeyValue'
-
-    KeyValue:
-      properties:
-        id:
-          description: AdServer Id of KeyValue or "audiencesegment" for an Audience Segment
-          type: string
-        label:
-          type: string
-        comparisonOperator:
-          description: 0 = equal, 1 = unequal
-          type: integer
-          enum:
-            - 0
-            - 1
-        values:
-          type: array
-          items:
-            $ref: '#/components/schemas/KeyValueValue'
-
-    KeyValueValue:
-      properties:
-        id:
-          description: AdServer Id of KeyValue/Audience Segment Value or "custom_{value}" for freetext values. For example the freetext value "15" has to be "custom_15"
-          type: string
-        label:
-          type: string
-
-    Customer:
-      properties:
-        customer:
-          description: Customer Object
-          type: object
-          required: [externalCrmId, firm, status, statusEc, language, mainAddress]
-          properties:
-            externalCrmId:
-              description: External CRM Id for referencing the customer
-              type: string
-            firm:
-              description: Name of the customer
-              type: string
-            mwst:
-              description: VAT Number
-              type: string
-            note:
-              description: Note on the client
-              type: string
-            status:
-              description: States if the customer is active or inactive. 1 = active, 0 = inactive
-              type: integer
-              enum: [1, 0]
-            statusEc:
-              description: Customer type. 1 = Customer, 2 = Intermediator, 3 = Agency, 5 = Publisher (Only available with marketer module activated)
-              type: integer
-              enum: [1, 2, 3, 5]
-            language:
-              description: Preferred language for this customer
-              type: string
-              enum: [de, en, fr, it]
-            bankAccountNumber:
-              description: Bank Account Number for this customer
-              type: string
-            bankIBANNumber:
-              description: IBAN for this customer
-              type: string
-            bankClearingNumber:
-              description: Bank Clearing for this customer
-              type: string
-            bankName:
-              description: Bank name for this customer
-              type: string
-            searchstring:
-              description: Search help to find this customer easier with other name(s)
-              type: string
-            vatType:
-              description: VAT Type (0 = Standard, 2 = VAT exempt, 3 = VAT reduced, 7 = VAT exempt embassy)
-              type: integer
-              default: 0
-              enum: [0, 2, 3, 7]
-            softDeleted:
-              description: If this customer should be treated as deleted.
-              example: false
-              type: boolean
-              default: false
-            commission:
-              description: Defines the default commissions for an agency or intermediator. Has no effect on statusEc != 2 or 3.
-              type: object
-              required: [bkCommission, vmkCommission, type]
-              properties:
-                bkCommission:
-                  description: Agency Commission aka BK (Beraterkommission) aka AP (Agenturprovision) in percent
-                  type: number
-                vmkCommission:
-                  description: Intermediator Commission aka VMK (Vermittlerkommission) aka DBE (Direktbuchungsentschädigung) aka 2. Provision aka 2. Agentur-Provision in percent
-                  type: number
-                type:
-                  description: |
-                    Type of commission. 
-                    0 = Standard (default) = bkCommission direct / vmkCommission direct
-                    2 = bkCommission direct / vmkCommission indirect (Accrual / Rückstellung)
-                    3 = bkCommission separate / vmkCommission indirect (Accrual / Rückstellung)
-                    4 = vmkCommission separate
-                  type: integer
-                  enum: [0, 2, 3, 4]
-            industry:
-              description: Customer industry
-              type: object
-              required: [externalCrmId]
-              properties:
-                externalCrmId:
-                  description: External CRM Id for referencing the industry
-                  type: string
-                name:
-                  description: Name of the industry. Will update the industry name for every customer that uses the same industry.
-                  type: string
-            addresses:
-              description: Customer addresses
-              type: array
-              items:
-                type: object
-                required: [externalCrmId, title, firm, street, zip, place, country]
-                properties:
-                  externalCrmId:
-                    description: External CRM Id for referencing the address
+                note:
+                    description: Corresponds with the field "Bemerkungen"
                     type: string
-                  title:
-                    description: Name/Label
+
+                noteInternal:
+                    description: Corresponds with the field "Interne Bemerkungen"
                     type: string
-                  firm:
-                    description: Company
+
+                noteBilling:
+                    description: Corresponds with the field "Faktura Bemerkungen"
                     type: string
-                  department:
-                    description: Departement
+
+                adServerId:
+                    description: Corresponds with the field "AdServer"
                     type: string
-                  street:
-                    description: Street
-                    type: string
-                  number:
-                    description: Street number
-                    type: string
-                  adresstext:
-                    description: Addition
-                    type: string
-                  zip:
-                    description: Zip code
-                    type: string
-                  place:
-                    description: City/Place
-                    type: string
-                  country:
-                    description: |
-                      Country (ISO 3166-1 alpha-2 Code) like "CH" / "DE" / "AT"
-                      https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-                    type: string
-                  externalId:
-                    description: External Id
-                    type: integer
-                  sendingRule:
-                    description: Invoice sending rule. Default is defined via admin center setting
-                    type: string
-                    enum: ['email', 'post']
-                  sendingRuleAddresses:
-                    description: E-Mail addresses for invoice sending. Only useful with sendingRule "email".
+
+                keyValueSets:
+                    description: Corresponds with the field "Targeting Configuration -> Key / Values"
                     type: array
                     items:
-                      type: string
-                  softDeleted:
-                    description: If this address should be treated as deleted.
-                    example: false
-                    type: boolean
-                    default: false
-            mainAddress:
-              description: Reference to the main address for this customer
-              type: object
-              required: [externalCrmId]
-              properties:
-                externalCrmId:
-                  description: External CRM Id for referencing the address. If a record with this externalCrmId does not exist, an empty one will be created.
-                  type: string
-            contacts:
-              description: Customer contacts
-              type: array
-              items:
-                type: object
-                required: [externalCrmId, peopleGender, peopleLastname, peopleName]
-                properties:
-                  externalCrmId:
-                    description: External CRM Id for referencing the contact
-                    type: string
-                  peopleGender:
-                    description: Gender. "M" = male, "F" = female, "D" = divers
-                    type: string
-                    enum: ['M', 'F', 'D']
-                  peopleLastname:
-                    description: Lastname
-                    type: string
-                  peopleName:
-                    description: Surname
-                    type: string
-                  peoplePhone:
-                    description: Phone Number
-                    type: string
-                  peopleNatel:
-                    description: Mobile Number
-                    type: string
-                  peopleEmail:
-                    description: E-Mail
-                    type: string
-                  peopleStatus:
-                    description: Status active/inactive. "A" = active. "N" = not active.
-                    type: string
-                    default: A
-                    enum: ['A', 'N']
-                  jobFunctions:
-                    description: Function name
-                    type: array
-                    items:
-                      type: object
-                      required: [lang, function]
-                      properties:
-                        lang:
-                          description: Language in which the function is saved (deprecated). Use "de" always
-                          type: string
-                          enum: ['de']
-                        function:
-                          description: The function name
-                          type: string
-            tags:
-              description: Customer tags
-              type: array
-              items:
-                type: object
-                required: [externalCrmId]
-                properties:
-                  externalCrmId:
-                    description: External CRM Id for referencing the tag
-                    type: string
-                  name:
-                    description: Name of the tag (if this property is set, it will update the name of the tag for every customer)
-                    type: string
-            references:
-              description: Customer references
-              type: array
-              items:
-                type: object
-                required: [externalCrmId]
-                properties:
-                  externalCrmId:
-                    description: External CRM Id for referencing the customer reference
-                    type: string
-                  referenceType:
-                    description: Type of the reference
-                    type: string
-                  referenceValue:
-                    description: Value of the reference
-                    type: string
-            consultants:
-              description: Customer consultants
-              type: array
-              items:
-                type: object
-                required: [email]
-                properties:
-                  email:
-                    description: E-Mail address of consultant
-                    type: string
-            paymentTerm:
-              description: Payment term for customer
-              type: object
-              required: [externalCrmId]
-              properties:
-                externalCrmId:
-                  description: External CRM Id for referencing the payment term
-                  type: string
-                days:
-                  description: Amount of days until the invoice has to be paid
-                  type: integer
-                name:
-                  description: Name of the payment term
-                  type: string
-                cashDiscountDays:
-                  description: How many days that a cash discount (skonto) can be applied
-                  type: integer
-                cashDiscountPercent:
-                  description: Percentage of cash discount (skonto) that can be applied
-                  type: number
-                billingPhrases:
-                  description: Text to print on invoice in different languages
-                  type: object
+                        $ref: '#/components/schemas/KeyValueSet'
+
+                geoTargetingByZip:
+                    description: Corresponds with the field "Targeting Configuration -> Geo Targeting -> PLZ"
+                    type: object
+                    properties:
+                        countryId:
+                            type: string
+                            enum:
+                                - US
+                                - CA
+                                - DE
+                                - FR
+                                - GB
+                                - IN
+                        zipCodes:
+                            description: Comma separated list of zip codes
+                            type: string
+
+        FlightCreate:
+            required:
+                - externalId
+                - adServerId
+                - runtime
+                - tarifId
+                - mediaId
+                - platformId
+                - channelId
+                - advertisingId
+                - priceTypeId
+                - units
+                - bruttoPriceUnit
+            allOf:
+                - $ref: "#/components/schemas/Flight"
+                - type: object
                   properties:
-                    de:
-                      description: German text
-                      type: string
-                    en:
-                      description: English text
-                      type: string
-                    fr:
-                      description: French text
-                      type: string
-                    it:
-                      description: Italian text
-                      type: string
+                      externalId:
+                          type: string
+
+        FlightRead:
+            allOf:
+                - $ref: "#/components/schemas/FlightCreate"
+
+        FlightSublines:
+            description: Represents the sublines for a flight (only for network flights)
+            type: object
+            properties:
+                sublines:
+                    type: array
+                    items:
+                        properties:
+                            platformId:
+                                description: Platform of the network
+                                type: integer
+                            percentage:
+                                description: Share of the platform in percent (42.5% = 42.5).
+                                example: 42.5
+                                type: number
+
+        UpdateCustomerResponse:
+            description: Response for successful, failed and unfinished costumer update jobs.
+            type: object
+            properties:
+                jobId:
+                    description: The job id. Currently this id can reset upon reboot of the server e.g. is not necessarily unique.
+                    type: integer
+                    example: 123
+                jobAlreadyFinished:
+                    description: Whether or not the job was able to return synchronously e.g. if true means the job was processed before the response was returned and thus the logs are returned as well in the response. False means the job still awaits processing.
+                    type: boolean
+                    example: true
+            allOf:
+                - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
+
+        CustomerErrorLogResponse:
+            description: The logs available when retrieving the customer
+            type: object
+            properties:
+                jobStatus:
+                    description: The status of the job in the queue, where JOB_STATUS_FINISHED_OK means all ok
+                    enum: ['NO_JOB_FOUND', 'JOB_STATUS_WAITING', 'JOB_STATUS_FINISHED_OK', 'JOB_STATUS_FINISHED_ERROR']
+                    type: string
+                sentJobId:
+                    description: job Id sent by you.
+                    type: integer
+                    example: 12
+            allOf:
+                - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
+
+        ContactRef:
+            description: This entity represents either a customer, agency, intermediator or publisher, either the external ID or the external CRM ID or the goTom ID can be set
+            type: object
+            nullable: true
+            properties:
+                entityId:
+                    description: ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
+                    type: integer
+                entityExternalId:
+                    description: External ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
+                    type: string
+                entityExternalCrmId:
+                    description: External CRM ID of the entity (might be a customer, agency, intermediator of publisher) for this contact (corresponds to the "Kunde", "Vermittler", "Agentur" field)
+                    type: string
+                addressId:
+                    description: ID of the address for this contact (corresponds to the "Adresse" field in the UI)
+                    type: integer
+                    nullable: true
+                addressExternalId:
+                    description: External ID of the address for this contact (corresponds to the "Adresse" field in the UI)
+                    type: string
+                    nullable: true
+                addressExternalCrmId:
+                    description: External CRM ID of the address for this contact (corresponds to the "Adresse" field in the UI)
+                    type: string
+                    nullable: true
+                personId:
+                    description: ID of the person for this contact (corresponds to the "Kontakt" field)
+                    type: integer
+                    nullable: true
+                personExternalId:
+                    description: External ID of the person for this contact (corresponds to the "Kontakt" field)
+                    type: string
+                    nullable: true
+                personExternalCrmId:
+                    description: External CRM ID of the person for this contact (corresponds to the "Kontakt" field)
+                    type: string
+                    nullable: true
+
+        DateTimeComponents:
+            description: Represents date and time (timezone is implicitly always the "system timezone" of goTom)
+            required:
+                - date
+            properties:
+                date:
+                    type: string
+                    format: date
+                time:
+                    description: Time without seconds in the format HH:MM
+                    type: string
+                    example: 12:34
+                    pattern: '^\d{2}:\d{2}$'
+
+        AnyValue:
+            description: Can be any value - string, number, boolean, array or object.
+            nullable: true
+            anyOf:
+                - type: string
+                - type: number
+                - type: integer
+                - type: boolean
+                - type: array
+                  items: {}
+                - type: object
+
+        InternalServerErrorResponse:
+            properties:
+                message:
+                    type: string
+                    example: Internal Server Error
+
+        ConstraintViolationResponse:
+            properties:
+                errors:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ConstraintViolationItem'
+
+        ConstraintViolationItem:
+            properties:
+                propertyPath:
+                    type: string
+                message:
+                    type: string
+                invalidValue:
+                    $ref: '#/components/schemas/AnyValue'
+                cause:
+                    $ref: '#/components/schemas/AnyValue'
+                code:
+                    type: string
+
+        Document:
+            properties:
+                name:
+                    type: string
+                    example: Test.pdf
+                content:
+                    type: string
+                    format: byte
+                    description: base64 encoded file content
+
+        ArchiveStatus:
+            properties:
+                setIsArchived:
+                    type: boolean
+                    example: true
+                    description: true to archive, false to un-archive / activate
+
+        KeyValueSet:
+            properties:
+                adServerId:
+                    type: string
+                keyValues:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/KeyValue'
+
+        KeyValue:
+            properties:
+                id:
+                    description: AdServer Id of KeyValue or "audiencesegment" for an Audience Segment
+                    type: string
+                label:
+                    type: string
+                comparisonOperator:
+                    description: 0 = equal, 1 = unequal
+                    type: integer
+                    enum:
+                        - 0
+                        - 1
+                values:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/KeyValueValue'
+
+        KeyValueValue:
+            properties:
+                id:
+                    description: AdServer Id of KeyValue/Audience Segment Value or "custom_{value}" for freetext values. For example the freetext value "15" has to be "custom_15"
+                    type: string
+                label:
+                    type: string
+
+        Customer:
+            properties:
+                customer:
+                    description: Customer Object
+                    type: object
+                    required: [externalCrmId, firm, status, statusEc, language, mainAddress]
+                    properties:
+                        externalCrmId:
+                            description: External CRM Id for referencing the customer
+                            type: string
+                        firm:
+                            description: Name of the customer
+                            type: string
+                        mwst:
+                            description: VAT Number
+                            type: string
+                        note:
+                            description: Note on the client
+                            type: string
+                        status:
+                            description: States if the customer is active or inactive. 1 = active, 0 = inactive
+                            type: integer
+                            enum: [1, 0]
+                        statusEc:
+                            description: Customer type. 1 = Customer, 2 = Intermediator, 3 = Agency, 5 = Publisher (Only available with marketer module activated)
+                            type: integer
+                            enum: [1, 2, 3, 5]
+                        language:
+                            description: Preferred language for this customer
+                            type: string
+                            enum: [de, en, fr, it]
+                        bankAccountNumber:
+                            description: Bank Account Number for this customer
+                            type: string
+                        bankIBANNumber:
+                            description: IBAN for this customer
+                            type: string
+                        bankClearingNumber:
+                            description: Bank Clearing for this customer
+                            type: string
+                        bankName:
+                            description: Bank name for this customer
+                            type: string
+                        searchstring:
+                            description: Search help to find this customer easier with other name(s)
+                            type: string
+                        vatType:
+                            description: VAT Type (0 = Standard, 2 = VAT exempt, 3 = VAT reduced, 7 = VAT exempt embassy)
+                            type: integer
+                            default: 0
+                            enum: [0, 2, 3, 7]
+                        softDeleted:
+                            description: If this customer should be treated as deleted.
+                            example: false
+                            type: boolean
+                            default: false
+                        commission:
+                            description: Defines the default commissions for an agency or intermediator. Has no effect on statusEc != 2 or 3.
+                            type: object
+                            required: [bkCommission, vmkCommission, type]
+                            properties:
+                                bkCommission:
+                                    description: Agency Commission aka BK (Beraterkommission) aka AP (Agenturprovision) in percent
+                                    type: number
+                                vmkCommission:
+                                    description: Intermediator Commission aka VMK (Vermittlerkommission) aka DBE (Direktbuchungsentschädigung) aka 2. Provision aka 2. Agentur-Provision in percent
+                                    type: number
+                                type:
+                                    description: |
+                                        Type of commission. 
+                                        0 = Standard (default) = bkCommission direct / vmkCommission direct
+                                        2 = bkCommission direct / vmkCommission indirect (Accrual / Rückstellung)
+                                        3 = bkCommission separate / vmkCommission indirect (Accrual / Rückstellung)
+                                        4 = vmkCommission separate
+                                    type: integer
+                                    enum: [0, 2, 3, 4]
+                        industry:
+                            description: Customer industry
+                            type: object
+                            required: [externalCrmId]
+                            properties:
+                                externalCrmId:
+                                    description: External CRM Id for referencing the industry
+                                    type: string
+                                name:
+                                    description: Name of the industry. Will update the industry name for every customer that uses the same industry.
+                                    type: string
+                        addresses:
+                            description: Customer addresses
+                            type: array
+                            items:
+                                type: object
+                                required: [externalCrmId, title, firm, street, zip, place, country]
+                                properties:
+                                    externalCrmId:
+                                        description: External CRM Id for referencing the address
+                                        type: string
+                                    title:
+                                        description: Name/Label
+                                        type: string
+                                    firm:
+                                        description: Company
+                                        type: string
+                                    department:
+                                        description: Departement
+                                        type: string
+                                    street:
+                                        description: Street
+                                        type: string
+                                    number:
+                                        description: Street number
+                                        type: string
+                                    adresstext:
+                                        description: Addition
+                                        type: string
+                                    zip:
+                                        description: Zip code
+                                        type: string
+                                    place:
+                                        description: City/Place
+                                        type: string
+                                    country:
+                                        description: |
+                                            Country (ISO 3166-1 alpha-2 Code) like "CH" / "DE" / "AT"
+                                            https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+                                        type: string
+                                    externalId:
+                                        description: External Id
+                                        type: integer
+                                    sendingRule:
+                                        description: Invoice sending rule. Default is defined via admin center setting
+                                        type: string
+                                        enum: ['email', 'post']
+                                    sendingRuleAddresses:
+                                        description: E-Mail addresses for invoice sending. Only useful with sendingRule "email".
+                                        type: array
+                                        items:
+                                            type: string
+                                    softDeleted:
+                                        description: If this address should be treated as deleted.
+                                        example: false
+                                        type: boolean
+                                        default: false
+                        mainAddress:
+                            description: Reference to the main address for this customer
+                            type: object
+                            required: [externalCrmId]
+                            properties:
+                                externalCrmId:
+                                    description: External CRM Id for referencing the address. If a record with this externalCrmId does not exist, an empty one will be created.
+                                    type: string
+                        contacts:
+                            description: Customer contacts
+                            type: array
+                            items:
+                                type: object
+                                required: [externalCrmId, peopleGender, peopleLastname, peopleName]
+                                properties:
+                                    externalCrmId:
+                                        description: External CRM Id for referencing the contact
+                                        type: string
+                                    peopleGender:
+                                        description: Gender. "M" = male, "F" = female, "D" = divers
+                                        type: string
+                                        enum: ['M', 'F', 'D']
+                                    peopleLastname:
+                                        description: Lastname
+                                        type: string
+                                    peopleName:
+                                        description: Surname
+                                        type: string
+                                    peoplePhone:
+                                        description: Phone Number
+                                        type: string
+                                    peopleNatel:
+                                        description: Mobile Number
+                                        type: string
+                                    peopleEmail:
+                                        description: E-Mail
+                                        type: string
+                                    peopleStatus:
+                                        description: Status active/inactive. "A" = active. "N" = not active.
+                                        type: string
+                                        default: A
+                                        enum: ['A', 'N']
+                                    jobFunctions:
+                                        description: Function name
+                                        type: array
+                                        items:
+                                            type: object
+                                            required: [lang, function]
+                                            properties:
+                                                lang:
+                                                    description: Language in which the function is saved (deprecated). Use "de" always
+                                                    type: string
+                                                    enum: ['de']
+                                                function:
+                                                    description: The function name
+                                                    type: string
+                        tags:
+                            description: Customer tags
+                            type: array
+                            items:
+                                type: object
+                                required: [externalCrmId]
+                                properties:
+                                    externalCrmId:
+                                        description: External CRM Id for referencing the tag
+                                        type: string
+                                    name:
+                                        description: Name of the tag (if this property is set, it will update the name of the tag for every customer)
+                                        type: string
+                        references:
+                            description: Customer references
+                            type: array
+                            items:
+                                type: object
+                                required: [externalCrmId]
+                                properties:
+                                    externalCrmId:
+                                        description: External CRM Id for referencing the customer reference
+                                        type: string
+                                    referenceType:
+                                        description: Type of the reference
+                                        type: string
+                                    referenceValue:
+                                        description: Value of the reference
+                                        type: string
+                        consultants:
+                            description: Customer consultants
+                            type: array
+                            items:
+                                type: object
+                                required: [email]
+                                properties:
+                                    email:
+                                        description: E-Mail address of consultant
+                                        type: string
+                        paymentTerm:
+                            description: Payment term for customer
+                            type: object
+                            required: [externalCrmId]
+                            properties:
+                                externalCrmId:
+                                    description: External CRM Id for referencing the payment term
+                                    type: string
+                                days:
+                                    description: Amount of days until the invoice has to be paid
+                                    type: integer
+                                name:
+                                    description: Name of the payment term
+                                    type: string
+                                cashDiscountDays:
+                                    description: How many days that a cash discount (skonto) can be applied
+                                    type: integer
+                                cashDiscountPercent:
+                                    description: Percentage of cash discount (skonto) that can be applied
+                                    type: number
+                                billingPhrases:
+                                    description: Text to print on invoice in different languages
+                                    type: object
+                                    properties:
+                                        de:
+                                            description: German text
+                                            type: string
+                                        en:
+                                            description: English text
+                                            type: string
+                                        fr:
+                                            description: French text
+                                            type: string
+                                        it:
+                                            description: Italian text
+                                            type: string
