@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 3.4.1
+  version: 3.4.2
   title: goTom API Documentation
 
 paths:
@@ -8,6 +8,17 @@ paths:
     post:
       tags: [Campaign]
       summary: Create the campaign by its external ID
+      parameters:
+        - in: query
+          name: update_commissions
+          schema:
+            type: boolean
+            default: 0
+            enum: [ 0, 1 ]
+          description: >
+            Has a particular behavior:
+             * **0**: commissions will not be updated e.g. commission values are 0. Single flight commissions can be updated by setting update_commissions: 1 on the create flight API endpoint. 
+             * **1**: commissions will be updated. Future flights created will always use those commissions as well (never matter if you set update_commissions to 0 on the flight create API endpoint)
       requestBody:
         content:
           application/json:
@@ -66,6 +77,25 @@ paths:
           schema:
             type: string
           required: true
+        - in: query
+          name: update_commissions
+          schema:
+            type: boolean
+            default: 0
+            enum: [ 0, 1 ]
+          description: >
+            Whether to update commissions or not
+             * **0**: commissions will not be updated and stay the same.
+             * **1**: commissions will be updated only if the payload as well has values set for the intermediator or agency. It is possible to resend the same values that are already in the system. 
+            Future flights created will always use those commissions as well (never matter if you set update_commissions to 0 on the flight create API endpoint)
+        - in: query
+          name: update_customer_discounts
+          schema:
+            type: boolean
+            default: 0
+            enum: [ 0, 1 ]
+          description: >
+            **0**: will not apply discounts. **1**: will update the discounts applied to all flights of this campaign.
       requestBody:
         content:
           application/json:
@@ -106,6 +136,25 @@ paths:
           schema:
             type: string
           required: true
+        - in: query
+          name: update_commissions
+          schema:
+            type: boolean
+            default: 0
+            enum: [ 0, 1 ]
+          description: >
+            Whether to update commissions or not. **Particular**: if the campaign was created or updated with update_commissions: 1, then the commission will be used even if a flight is created with update_commissions: 0
+             * **0**: Use the commission as configured on the campaign. 
+             * **1**: Commissions will be updated for this flight.
+        - in: query
+          name: update_customer_discounts
+          schema:
+            type: boolean
+            default: 0
+            enum: [ 0, 1 ]
+          description: >
+            **0**: will not apply discounts. **1**: will update the discounts applied to this flight.
+
       requestBody:
         content:
           application/json:
