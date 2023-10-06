@@ -1,9 +1,57 @@
 openapi: 3.0.0
 info:
-  version: 3.4.1
+  version: 3.5.0
   title: goTom API Documentation
 
 paths:
+  /app-api/primary-keys/{entity}:
+    get:
+      tags: [Primary-Keys]
+      summary: Get a list of goTom primary keys with associated names to the provided entity.
+      description: The primary keys provided here are needed in other calls like to create CampaignFlight. It contains pagination after a 1000 max result limit.
+      parameters:
+        - in: path
+          name: entity
+          description: This is the entity name. Typically if looking for say, 'tarifId', the entity is called 'tarif'. And the `id` value returned is what one would enter as `tarifId`.
+          schema:
+            type: string
+            enum:
+              - tarif
+              - priceType
+              - adServer
+              - campaignType
+              - extraPriceLevel
+              - platform
+              - channel
+              - media
+              - advertising
+          required: true
+        - in: query
+          name: page
+          description: From 1 to the last page number found in the pagination part of the response.
+          schema:
+            type: integer
+            default: 1
+      responses:
+        '200':
+          description: Returns pagination, items
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PrimaryKeysRead'
+        '422':
+          description: Invalid entity provided.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      msg:
+                        type: string
+                        example: "'tarifffff' is not a valid entity. Valid entities are: 'adServer','tarif','priceType','campaignType','extraPriceLevel','platform','channel','media','advertising'"
   /app-api/campaign:
     post:
       tags: [Campaign]
@@ -196,7 +244,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
     delete:
-      tags: [ CampaignFlight ]
+      tags: [CampaignFlight]
       summary: Delete the flight by its external ID
       parameters:
         - in: path
@@ -571,6 +619,45 @@ components:
                       - placements
                 remarks:
                   type: string
+
+    PrimaryKeysRead:
+      description: A primary key, item name list
+      type: object
+      properties:
+        pagination:
+          type: object
+          properties:
+            totalItems:
+              type: integer
+              example: 33
+            perPage:
+              type: integer
+              example: 1000
+            currentPage:
+              type: integer
+              example: 1
+            lastPage:
+              type: integer
+              example: 1
+            nextPageUrl:
+              description: if there are too many items retrieved to fit in one response, you can retrieve the remaining by using the next URL to access the next page
+              example: https://demo.gotom.io/app-api/primary-keys/tarifId?page=2
+              type: string
+              nullable: true
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                description: The primary key of the item. This is always an integer except for entity `adServer`, where it is a string
+                oneOf:
+                  - type: integer
+                  - type: string
+              name:
+                description: The associated name of the primary key. For example, the name of the channel.
+                type: string
+                example: Desktop
 
     CampaignCreate:
       required:
