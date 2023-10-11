@@ -127,14 +127,6 @@ paths:
             Whether to update commissions or not
              * **0**: commissions will not be updated and stay the same even if agency and/or intermediator are changed. Flights created hereafter will use the old commissions.
              * **1**: commissions will be updated only if the payload as well has values set for the intermediator or agency. Flights created hereafter will always use those commissions as well.
-        - in: query
-          name: update_customer_discounts
-          schema:
-            type: boolean
-            default: 0
-            enum: [ 0, 1 ]
-          description: >
-            **0**: will not apply discounts. **1**: will update the discounts applied to all flights of this campaign.
       requestBody:
         content:
           application/json:
