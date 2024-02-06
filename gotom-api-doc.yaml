@@ -283,7 +283,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConstraintViolationResponse'
         '501':
-          $ref: '#/components/responses/OrfCaseNotImplemented'
+          $ref: '#/components/responses/SumUpCaseNotImplemented'
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
 
@@ -318,7 +318,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConstraintViolationResponse'
         '501':
-          $ref: '#/components/responses/OrfCaseNotImplemented'
+          $ref: '#/components/responses/SumUpCaseNotImplemented'
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
     delete:
@@ -339,7 +339,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConstraintViolationResponse'
         '501':
-          $ref: '#/components/responses/OrfCaseNotImplemented'
+          $ref: '#/components/responses/SumUpCaseNotImplemented'
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
 
@@ -1477,7 +1477,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/InternalServerErrorResponse'
-    OrfCaseNotImplemented:
+    SumUpCaseNotImplemented:
       description: >
         * Code: `4c396abe-92c8-45ae-a3af-9baa4b76bbda` - Api discount manipulation currently not supported for sum up strategy.
       content:
