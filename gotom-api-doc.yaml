@@ -1457,18 +1457,24 @@ components:
       schema:
         type: string
       required: true
+      example: example-campaign
+      description: "External ID of a campaign. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
     ParamFlightExternalId:
       in: path
       name: flightExternalId
+      example: example-flight
       schema:
         type: string
       required: true
+      description: "External ID of a flight. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
     ParamFlightDiscountExternalId:
       in: path
       name: flightDiscountExternalId
+      example: example-flight-discount
       schema:
         type: string
       required: true
+      description: "External ID of a discount. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
 
   responses:
     InternalServerErrorDefault:
