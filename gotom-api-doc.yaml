@@ -930,7 +930,7 @@ components:
                 example: 42.5
                 type: number
               note:
-                description: Subline note for the Platform.
+                description: Remark for this FlightSubline.
                 example: Subline Remarks Test
                 type: string
 
