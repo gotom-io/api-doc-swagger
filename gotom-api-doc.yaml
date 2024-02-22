@@ -929,6 +929,10 @@ components:
                 description: Share of the platform in percent (42.5% = 42.5).
                 example: 42.5
                 type: number
+              note:
+                description: Subline note for the Platform.
+                example: Subline Remarks Test
+                type: string
 
     UpdateCustomerResponse:
       description: Response for successful, failed and unfinished costumer update jobs.
