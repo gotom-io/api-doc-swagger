@@ -691,9 +691,6 @@ components:
       allOf:
         - type: object
           properties:
-            externalId:
-              type: string
-              example: myExternalId1234
             name:
               type: string
               example: Great discount
