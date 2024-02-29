@@ -192,7 +192,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
-
+                
+  /app-api/campaign/{campaignExternalId}/flight-lineitemid/{flightExternalId}:
+    get:
+      tags: [CampaignFlight]
+      summary: Retrieve the flight lineItemIDs and StrategyIDs if flight is connected with adServer(s)
+      parameters:
+        - in: path
+          name: campaignExternalId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: flightExternalId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Return the adserver strategyId and lineitemid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightLineItemId'
+        '404':
+          description: Flight has not been found
+          
   /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}:
     get:
       tags: [CampaignFlight]
@@ -786,7 +811,17 @@ components:
                   description: Corresponds with the field "Verkauf"
                   type: string
                   example: sales-support@acme-corp.ch
-
+    FlightLineItemId:
+      description: A goTom Flight
+      type: object
+      properties:
+        StrategyId:
+          description: Corresponds to the adServer Strategy 
+          type: string
+        AdserverId:
+          description: Corresponds to the lineItemId of flight status 
+          type: integer
+          
     Flight:
       description: A goTom Flight
       type: object
