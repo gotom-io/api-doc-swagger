@@ -815,10 +815,10 @@ components:
       description: A goTom Flight
       type: object
       properties:
-        StrategyId:
+        strategyId:
           description: Corresponds to the adServer Strategy 
           type: string
-        AdserverId:
+        adserverId:
           description: Corresponds to the lineItemId of flight status 
           type: integer
           
