@@ -277,7 +277,8 @@ paths:
              * `5268ee13-0ad7-4393-a4be-6e17fbeb9569` - Flight discount cannot set both percentage and amount - send only one.
              * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Error: Delta-Invoice exists
              * `fb5f05f4-ee4e-41a9-9370-14415bdc12ea` - Error: At least one Flight has already been invoiced.
-             * `586bec40-0170-4a20-81a3-328afcef65a5` - Flight discount external id: "111111" is already in use with a flight id "222222".
+             * `586bec40-0170-4a20-81a3-328afcef65a5` - Flight discount external id: "exampleExternalId1" is already in use with flight with external id "exampleExternalId2".
+             * `0e31a231-9575-4430-8ab2-937bbd9e771d` - Flight with external ID 'exampleExternalId' is already partly invoiced.
           content:
             application/json:
               schema:
@@ -312,7 +313,8 @@ paths:
              * `5268ee13-0ad7-4393-a4be-6e17fbeb9569` - Flight discount cannot set both percentage and amount - send only one.
              * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Error: Delta-Invoice exists
              * `fb5f05f4-ee4e-41a9-9370-14415bdc12ea` - Error: At least one Flight has already been invoiced.
-             * `bdba6ce3-3884-450d-a3b3-0e790ba2cbc8` - Flight discount external id: "11111111" is already in use with a different flight id 222222.
+             * `bdba6ce3-3884-450d-a3b3-0e790ba2cbc8` - Flight discount external id: "exampleExternalId1" is already in use with flight with external id "exampleExternalId2".
+             * `0e31a231-9575-4430-8ab2-937bbd9e771d` - Flight with external ID 'exampleExternalId' is already partly invoiced.
           content:
             application/json:
               schema:
@@ -334,6 +336,7 @@ paths:
             Returns a list of errors in the input data. For this call the following violation codes can be expected:
              * `cfa53928-478d-4c37-b844-d0643be2b2b4` - Error: At least one Flight has already been invoiced. 
              * `26415fc8-24d2-4cd7-8561-a62fe636f3c4` - Changes not allowed. Flight already deferred.
+             * `0e31a231-9575-4430-8ab2-937bbd9e771d` - Flight with external ID 'exampleExternalId' is already partly invoiced.
           content:
             application/json:
               schema:
