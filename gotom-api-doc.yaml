@@ -196,7 +196,7 @@ paths:
   /app-api/campaign/{campaignExternalId}/flight-lineitemid/{flightExternalId}:
     get:
       tags: [CampaignFlight]
-      summary: Retrieve the flight lineItemIDs and strategyIDs if flight is connected with adServer(s)
+      summary: Retrieve the Flight LineItem Ids and Strategy Ids if it is connected with an AdServer
       parameters:
         - in: path
           name: campaignExternalId
@@ -813,11 +813,11 @@ components:
                   example: sales-support@acme-corp.ch
                   
     FlightLineItemId:
-      description: A goTom Flight
+      description: AdServer LineItem Connection
       type: object
       properties:
         strategyId:
-          description: Corresponds to the adServer strategy 
+          description: Corresponds to the adServer strategy
           type: string
         adserverId:
           description: Corresponds to the lineItemId of flight status 
