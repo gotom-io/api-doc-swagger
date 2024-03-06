@@ -236,7 +236,7 @@ paths:
                 $ref: '#/components/schemas/ConstraintViolationResponse'
         '404':
           description: Flight has not been found
-  /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/flight-discount/:
+  /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/flight-discount:
     parameters:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
       - $ref: '#/components/parameters/ParamFlightExternalId'
