@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.0.0
+  version: 4.1.0
   title: goTom API Documentation
 
 paths:
@@ -434,7 +434,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerErrorResponse'
-
+  
+  /app-api/campaign/{campaignExternalId}/commission-status:
+      post:
+          tags: [Campaign]
+          summary: Set the commission status of a campaign
+          parameters:
+              - in: path
+                name: campaignExternalId
+                schema:
+                    type: string
+                required: true
+          requestBody:
+              content:
+                  application/json:
+                      schema:
+                          $ref: '#/components/schemas/CommissionStatus'
+          responses:
+              '204':
+                  description: Commission status was updated successfully
+              '404':
+                  description: The campaign does not exist
+              '400':
+                  description: >
+                      Returns a list of errors in the input data. For this call the following violation codes can be expected
+                      * `48f7f665-0181-431c-a094-d6a09842690f` - Cannot change commission because flights were already invoiced in this campaign
+                      * `9bf0acca-73cf-448f-8907-bc70ae240b16` - The provided commission status value is invalid
+              '500':
+                  description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+                  content:
+                      application/json:
+                          schema:
+                              $ref: '#/components/schemas/InternalServerErrorResponse'
   /app-api/crm-sync-import-external-crm-id/update-customer:
     post:
       tags: [Customer]
@@ -757,6 +788,11 @@ components:
               nullable: true
               description: Reference for Campaign Type
               type: string
+              
+            commissionStatus:
+              description: Corresponds with the field "Kommissions-Abrechnung"
+              type: integer
+              example: 4
 
             flights:
               type: array
@@ -1107,6 +1143,19 @@ components:
           type: boolean
           example: true
           description: true to archive, false to un-archive / activate
+
+    CommissionStatus:
+      properties:
+        commissionStatus:
+          type: integer
+          enum: [0, 2, 3, 4]
+          example: 4
+          description: >
+              Commission status:
+               * `0` - Commission direct
+               * `2` - AC direct, Agency rebate indirect (accrual)
+               * `3` - AC separate, Agency rebate indirect (accrual)
+               * `4` - Agency rebate separate
 
     KeyValueSet:
       properties:
