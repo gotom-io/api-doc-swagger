@@ -1235,7 +1235,7 @@ components:
               type: array
               items:
                 type: object
-                required: [externalCrmId, title, firm, street, zip, place, country]
+                required: [externalCrmId, title, firm, zip, place, country]
                 properties:
                   externalCrmId:
                     description: External CRM Id for referencing the address
