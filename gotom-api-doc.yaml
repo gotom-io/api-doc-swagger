@@ -458,8 +458,10 @@ paths:
               '400':
                   description: >
                       Returns a list of errors in the input data. For this call the following violation codes can be expected
-                      * `48f7f665-0181-431c-a094-d6a09842690f` - Cannot change commission because flights were already invoiced in this campaign
-                      * `9bf0acca-73cf-448f-8907-bc70ae240b16` - The provided commission status value is invalid
+                       * `48f7f665-0181-431c-a094-d6a09842690f` - Cannot change commission because flights were already invoiced in this campaign
+                       * `9bf0acca-73cf-448f-8907-bc70ae240b16` - The provided commission status value is invalid
+                       * `16a35de8-46dd-454d-9150-b11280782ff9` - Billing validator failed the commission status update
+                      
               '500':
                   description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
                   content:
