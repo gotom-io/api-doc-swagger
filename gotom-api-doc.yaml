@@ -168,6 +168,31 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
 
+  /app-api/campaign/{campaignExternalId}/flight-lineitemid/{flightExternalId}:
+    get:
+      tags: [CampaignFlight]
+      summary: Retrieve the Flight LineItem Ids and Strategy Ids if it is connected with an AdServer
+      parameters:
+        - in: path
+          name: campaignExternalId
+          schema:
+            type: string
+          required: true
+        - in: path
+          name: flightExternalId
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Return the adserver strategyId and lineitemid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightLineItemId'
+        '404':
+          description: Flight has not been found
+
   /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}:
     parameters:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
@@ -860,6 +885,17 @@ components:
                   type: string
                   example: sales-support@acme-corp.ch
 
+    FlightLineItemId:
+      description: AdServer LineItem Connection
+      type: object
+      properties:
+        strategyId:
+          description: Corresponds to the adServer strategy
+          type: string
+        adserverId:
+          description: Corresponds to the lineItemId of flight status
+          type: integer
+
     Flight:
       description: A goTom Flight
       type: object
@@ -1002,6 +1038,10 @@ components:
                 description: Share of the platform in percent (42.5% = 42.5).
                 example: 42.5
                 type: number
+              note:
+                description: Subline note for the Platform.
+                example: Remark for this FlightSubline
+                type: string
 
     UpdateCustomerResponse:
       description: Response for successful, failed and unfinished costumer update jobs.
@@ -1268,7 +1308,7 @@ components:
               type: array
               items:
                 type: object
-                required: [externalCrmId, title, firm, street, zip, place, country]
+                required: [externalCrmId, title, firm, zip, place, country]
                 properties:
                   externalCrmId:
                     description: External CRM Id for referencing the address
