@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.0.0
+  version: 4.1.0
   title: goTom API Documentation
 
 paths:
@@ -81,22 +81,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConstraintViolationResponse'
         '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+          $ref: '#/components/responses/InternalServerErrorDefault'
 
   /app-api/campaign/{campaignExternalId}:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
     get:
       tags: [Campaign]
       summary: Retrieve the campaign by its external ID
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
       responses:
         '200':
           description: Return the campaign data
@@ -112,11 +104,6 @@ paths:
       summary: Update the campaign by its external ID. All the properties are optional, only the supplied properties are changed.
       description: Notice that when changing the customer, it will apply the new customer discounts automatically.
       parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
         - in: query
           name: update_commissions
           schema:
@@ -151,22 +138,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ConstraintViolationResponse'
         '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+          $ref: '#/components/responses/InternalServerErrorDefault'
 
   /app-api/campaign/{campaignExternalId}/flight:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
     post:
       tags: [CampaignFlight]
       summary: Create a new flight
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
       requestBody:
         content:
           application/json:
@@ -187,12 +166,8 @@ paths:
              * `e3a1d7f7-4fcf-4b7d-8d87-38a60126462f` - The combination of `platformId`, `channelId` and `advertisingId` does not exist
              * `409d70bf-376e-4a21-a8d0-f75a4a6a7abc` - There is no price entry found for the combination of `platformId`, `channelId`, `advertisingId`, `tarifId`, `extraPriceLevelId` and `priceTypeId` does not exist
         '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
-                
+          $ref: '#/components/responses/InternalServerErrorDefault'
+
   /app-api/campaign/{campaignExternalId}/flight-lineitemid/{flightExternalId}:
     get:
       tags: [CampaignFlight]
@@ -217,22 +192,14 @@ paths:
                 $ref: '#/components/schemas/FlightLineItemId'
         '404':
           description: Flight has not been found
-          
+
   /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
+      - $ref: '#/components/parameters/ParamFlightExternalId'
     get:
       tags: [CampaignFlight]
       summary: Retrieve the flight by its external ID
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
       responses:
         '200':
           description: Return the campaign data
@@ -245,17 +212,6 @@ paths:
     post:
       tags: [CampaignFlight]
       summary: Update the flight by its external ID. All the properties are optional, only the supplied properties are changed.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
       requestBody:
         content:
           application/json:
@@ -276,25 +232,11 @@ paths:
              * `409d70bf-376e-4a21-a8d0-f75a4a6a7abc` - There is no price entry found for the combination of `platformId`, `channelId`, `advertisingId`, `tarifId`, `extraPriceLevelId` and `priceTypeId` does not exist
              * `24a9375a-0b22-4676-9a29-9c9e7f2c195f` - The adServerId provided in the KeyValueSet is invalid
         '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+          $ref: '#/components/responses/InternalServerErrorDefault'
+
     delete:
       tags: [CampaignFlight]
       summary: Delete the flight by its external ID
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
       responses:
         '204':
           description: Flight has been deleted
@@ -319,23 +261,124 @@ paths:
                 $ref: '#/components/schemas/ConstraintViolationResponse'
         '404':
           description: Flight has not been found
+  /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/flight-discount:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
+      - $ref: '#/components/parameters/ParamFlightExternalId'
+    get:
+      tags: [CampaignFlight]
+      summary: Read flight discounts of a flight that were created via API and have an externalId
+      responses:
+        '200':
+          description: Flight discounts have been returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  discounts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FlightDiscountRead'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
+
+    post:
+      tags: [CampaignFlight]
+      summary: Create a flight discount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlightDiscountCreate'
+      responses:
+        '204':
+          description: Flight discount has been created.
+        '404':
+          description: A flight does not exist with that external id.
+        '400':
+          description: >
+            Returns a list of errors in the input data. For this call the following violation codes can be expected:
+             * `5268ee13-0ad7-4393-a4be-6e17fbeb9569` - Flight discount cannot set both percentage and amount - send only one.
+             * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Error: Delta-Invoice exists
+             * `fb5f05f4-ee4e-41a9-9370-14415bdc12ea` - Error: At least one Flight has already been invoiced.
+             * `586bec40-0170-4a20-81a3-328afcef65a5` - Flight discount external id: "exampleExternalId1" is already in use with flight with external id "exampleExternalId2".
+             * `0e31a231-9575-4430-8ab2-937bbd9e771d` - Flight with external ID 'exampleExternalId' is already partly invoiced.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolationResponse'
+        '501':
+          $ref: '#/components/responses/SumUpCaseNotImplemented'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
+
+  /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/flight-discount/{flightDiscountExternalId}:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
+      - $ref: '#/components/parameters/ParamFlightExternalId'
+      - $ref: '#/components/parameters/ParamFlightDiscountExternalId'
+
+    patch:
+      tags: [CampaignFlight]
+      summary: Update a flight discount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlightDiscountUpdate'
+      responses:
+        '204':
+          description: Flight discount has been updated
+        '404':
+          description: A flight discount does not exist with that external id.
+        '400':
+          description: >
+            Returns a list of errors in the input data. For this call the following violation codes can be expected:
+             * `5268ee13-0ad7-4393-a4be-6e17fbeb9569` - Flight discount cannot set both percentage and amount - send only one.
+             * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Error: Delta-Invoice exists
+             * `fb5f05f4-ee4e-41a9-9370-14415bdc12ea` - Error: At least one Flight has already been invoiced.
+             * `bdba6ce3-3884-450d-a3b3-0e790ba2cbc8` - Flight discount external id: "exampleExternalId1" is already in use with flight with external id "exampleExternalId2".
+             * `0e31a231-9575-4430-8ab2-937bbd9e771d` - Flight with external ID 'exampleExternalId' is already partly invoiced.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolationResponse'
+        '501':
+          $ref: '#/components/responses/SumUpCaseNotImplemented'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
+    delete:
+      tags: [CampaignFlight]
+      summary: Delete a flight discount
+      responses:
+        '204':
+          description: Flight discount has been deleted
+        '404':
+          description: A flight discount does not exist with that external id.
+        '400':
+          description: >
+            Returns a list of errors in the input data. For this call the following violation codes can be expected:
+             * `cfa53928-478d-4c37-b844-d0643be2b2b4` - Error: At least one Flight has already been invoiced. 
+             * `26415fc8-24d2-4cd7-8561-a62fe636f3c4` - Changes not allowed. Flight already deferred.
+             * `0e31a231-9575-4430-8ab2-937bbd9e771d` - Flight with external ID 'exampleExternalId' is already partly invoiced.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolationResponse'
+        '501':
+          $ref: '#/components/responses/SumUpCaseNotImplemented'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
 
 
   /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/sublines:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
+      - $ref: '#/components/parameters/ParamFlightExternalId'
     get:
       tags: [CampaignFlightSubline]
       summary: Retrieve the flight's sublines by its external ID. This endpoint only available if the marketer network module is active.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
       responses:
         '200':
           description: Return the campaign data
@@ -349,17 +392,6 @@ paths:
     post:
       tags: [CampaignFlightSubline]
       summary: Create/Update the sublines for a flight. This endpoint only available if the marketer network module is active.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
-        - in: path
-          name: flightExternalId
-          schema:
-            type: string
-          required: true
       requestBody:
         content:
           application/json:
@@ -376,22 +408,14 @@ paths:
              * `d368a263-4bd7-4f21-bccf-1188df46991c` - The `platformId` of the given subline does not belong to the network defined in the flight's `platformId`.
              * `3b254c3d-590c-4edc-b763-c49f5a703355` - The `percentage` values of all `sublines` do not add up to 100%
         '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+          $ref: '#/components/responses/InternalServerErrorDefault'
 
   /app-api/campaign/{campaignExternalId}/document:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
     post:
       tags: [Campaign]
       summary: Create a new campaign document for an existing campaign.
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
       requestBody:
         content:
           application/json:
@@ -404,15 +428,11 @@ paths:
           description: The campaign does not exist
 
   /app-api/campaign/{campaignExternalId}/archive-status:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
     post:
       tags: [Campaign]
       summary: Set archive status of a campaign
-      parameters:
-        - in: path
-          name: campaignExternalId
-          schema:
-            type: string
-          required: true
       requestBody:
         content:
           application/json:
@@ -429,11 +449,7 @@ paths:
             * `28a27691-46f0-4bc2-9806-100587d7a962` - The campaign was already billed, cannot archive / unarchive
             * `e0a1561a-631e-4d1b-99fe-6a7e7f89b4dd` - The campaign was partially invoiced, cannot archive
         '500':
-          description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerErrorResponse'
+          $ref: '#/components/responses/InternalServerErrorDefault'
 
   /app-api/crm-sync-import-external-crm-id/update-customer:
     post:
@@ -658,6 +674,63 @@ components:
                 remarks:
                   type: string
 
+    FlightDiscountRead:
+      allOf:
+        - type: object
+          properties:
+            externalId:
+              type: string
+              example: myExternalId1234
+            name:
+              type: string
+              example: Special discount
+            amountPercent:
+              type: number
+              format: float
+              example: 5.5
+            amountSum:
+              type: number
+              format: float
+              example: 0
+
+    FlightDiscountCreate:
+      allOf:
+        - type: object
+          properties:
+            externalId:
+              type: string
+            name:
+              type: string
+            amountPercent:
+              type: number
+              format: float
+              example: 5.5
+            amountSum:
+              type: number
+              format: float
+              example: 0
+          required:
+            - externalId
+            - name
+            - amountPercent
+            - amountSum
+
+    FlightDiscountUpdate:
+      allOf:
+        - type: object
+          properties:
+            name:
+              type: string
+              example: Great discount
+            amountPercent:
+              type: number
+              format: float
+              example: 5.5
+            amountSum:
+              type: number
+              format: float
+              example: 0
+
     PrimaryKeysRead:
       description: A primary key, item name list
       type: object
@@ -811,7 +884,7 @@ components:
                   description: Corresponds with the field "Verkauf"
                   type: string
                   example: sales-support@acme-corp.ch
-                  
+
     FlightLineItemId:
       description: AdServer LineItem Connection
       type: object
@@ -820,9 +893,9 @@ components:
           description: Corresponds to the adServer strategy
           type: string
         adserverId:
-          description: Corresponds to the lineItemId of flight status 
+          description: Corresponds to the lineItemId of flight status
           type: integer
-          
+
     Flight:
       description: A goTom Flight
       type: object
@@ -1417,3 +1490,43 @@ components:
                     it:
                       description: Italian text
                       type: string
+  parameters: # we are still on components level here
+    ParamCampaignExternalId:
+      in: path
+      name: campaignExternalId
+      schema:
+        type: string
+      required: true
+      example: example-campaign
+      description: "External ID of a campaign. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+    ParamFlightExternalId:
+      in: path
+      name: flightExternalId
+      example: example-flight
+      schema:
+        type: string
+      required: true
+      description: "External ID of a flight. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+    ParamFlightDiscountExternalId:
+      in: path
+      name: flightDiscountExternalId
+      example: example-flight-discount
+      schema:
+        type: string
+      required: true
+      description: "External ID of a discount. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+
+  responses:
+    InternalServerErrorDefault:
+      description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalServerErrorResponse'
+    SumUpCaseNotImplemented:
+      description: >
+        * Code: `4c396abe-92c8-45ae-a3af-9baa4b76bbda` - Api discount manipulation currently not supported for sum up strategy.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConstraintViolationResponse'
