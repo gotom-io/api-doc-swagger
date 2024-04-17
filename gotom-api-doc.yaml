@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.1.0
+  version: 4.2.0
   title: goTom API Documentation
 
 paths:
@@ -452,15 +452,11 @@ paths:
           $ref: '#/components/responses/InternalServerErrorDefault'
   
   /app-api/campaign/{campaignExternalId}/commission-status:
+      parameters:
+          - $ref: '#/components/parameters/ParamCampaignExternalId'
       post:
           tags: [Campaign]
           summary: Set the commission status of a campaign
-          parameters:
-              - in: path
-                name: campaignExternalId
-                schema:
-                    type: string
-                required: true
           requestBody:
               content:
                   application/json:
@@ -480,6 +476,7 @@ paths:
                       
               '500':
                   $ref: '#/components/responses/InternalServerErrorDefault'
+                  
   /app-api/crm-sync-import-external-crm-id/update-customer:
     post:
       tags: [Customer]
