@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.2.0
+  version: 4.3.0
   title: goTom API Documentation
 
 paths:
@@ -473,28 +473,16 @@ paths:
                       * `48f7f665-0181-431c-a094-d6a09842690f` - Cannot change commission because flights were already invoiced in this campaign
                       * `9bf0acca-73cf-448f-8907-bc70ae240b16` - The provided commission status value is invalid
                       * `16a35de8-46dd-454d-9150-b11280782ff9` - Changes not allowed. Flight already deferred
-              
               '500':
-                  description: If your request broke our code. Send us your request-document to reproduce the error and we'll fix it.
-                  content:
-                      application/json:
-                          schema:
-                              $ref: '#/components/schemas/InternalServerErrorResponse'
+                  $ref: '#/components/responses/InternalServerErrorDefault'
+  
   /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/commission:
+      parameters:
+          -   $ref: '#/components/parameters/ParamCampaignExternalId'
+          -   $ref: '#/components/parameters/ParamFlightExternalId'
       get:
           tags: [ CampaignFlight ]
           summary: Retrieve the flight's commission values by its external ID.
-          parameters:
-              -   in: path
-                  name: campaignExternalId
-                  schema:
-                      type: string
-                  required: true
-              -   in: path
-                  name: flightExternalId
-                  schema:
-                      type: string
-                  required: true
           responses:
               '200':
                   description: Returns the commission data
@@ -508,17 +496,6 @@ paths:
       post:
           tags: [CampaignFlight]
           summary: Set the commission status of a campaign
-          parameters:
-              - in: path
-                name: campaignExternalId
-                schema:
-                    type: string
-                required: true
-              - in: path
-                name: flightExternalId
-                schema:
-                    type: string
-                required: true
           requestBody:
               content:
                   application/json:
@@ -535,7 +512,6 @@ paths:
                       * `6e40c9b1-7f75-4a3a-8149-26adecd9a5d4` - Commission update failed: Please provide either a percentage or amount for the commissions but not both
                       * `319df8c2-8264-4dc5-9af9-681f57549464` - Commission update failed: Delta-Invoice exists
                       * `79b246cc-c269-458b-962a-36f867c2dc75` - Commission update failed: At least one Flight has already been invoiced.
-              
               '500':
                   $ref: '#/components/responses/InternalServerErrorDefault'
                   
