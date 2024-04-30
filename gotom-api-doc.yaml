@@ -511,7 +511,7 @@ paths:
                       Returns a list of errors in the input data. For this call the following violation codes can be expected
                       * `6e40c9b1-7f75-4a3a-8149-26adecd9a5d4` - Commission update failed: Please provide either a percentage or amount for the commissions but not both
                       * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Error: Delta-Invoice exists
-                      * `fb5f05f4-ee4e-41a9-9370-14415bdc12ea` - Error: At least one Flight has already been invoiced.
+                      * `407eebae-cb0c-49fd-9708-4312452133ee` - Cannot change commission because flight is already invoiced
               '500':
                   $ref: '#/components/responses/InternalServerErrorDefault'
                   
