@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.3.0
+  version: 4.4.0
   title: goTom API Documentation
 
 paths:
@@ -261,30 +261,100 @@ paths:
                 $ref: '#/components/schemas/ConstraintViolationResponse'
         '404':
           description: Flight has not been found
-  /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/flight-discount:
+
+  /app-api/campaign/{campaignExternalId}/campaign-discount:
     parameters:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
-      - $ref: '#/components/parameters/ParamFlightExternalId'
     get:
-      tags: [CampaignFlight]
-      summary: Read flight discounts of a flight that were created via API and have an externalId
+      tags: [CampaignDiscount]
+      summary: Retrieve campaign discounts and their flight discounts
+      description: |
+        Retrieves campaign discounts and their associated flight discounts for a specific campaign.
       responses:
         '200':
-          description: Flight discounts have been returned.
+          description: Campaign discounts and flight discounts have been returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignDiscountsRead'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
+    post:
+      tags: [CampaignDiscount]
+      summary: Create a campaign discount
+      description: A reason for a campaign discount is to e.g. be able to collect all flight discounts to a single column in finance documents.
+      responses:
+        '201':
+          description: Campaign discount has been created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignDiscountWrite'
+        '400':
+          description: >
+            Returns a list of errors in the input data. For this call the following violation codes can be expected errors:
+               * `450ae979-312c-45b9-b61a-dfcde745b8e7` - Cannot create campaign discount with an external id that is already in use. Campaign discount external id: "{{ campaignDiscountExternalId }}" is already in use in campaign with external id "{{ campaignExternalId }}". Use update instead or use a different external id.
+               * `0e31a231-9575-4430-8ab2-937bbd9e771d` - Flight with external ID '{{ flightExternalId }}' is already partly invoiced.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
+  /app-api/campaign/{campaignExternalId}/campaign-discount/{campaignDiscountExternalId}:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
+      - $ref: '#/components/parameters/ParamCampaignDiscountExternalId'
+    patch:
+      tags: [CampaignDiscount]
+      summary: Update a campaign discount
+      responses:
+        '204':
+          description: Campaign discount has been updated.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  discounts:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/FlightDiscountRead'
+                  name:
+                    description: This name will appear e.g. in finance documents
+                    type: string
+                    example: "Great discount for john doe"
+        '400':
+          description: >
+            Returns a list of errors in the input data. For this call the following violation codes can be expected errors:
+               * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Fehler: Delta-Rechnung vorhanden. (Kampagne: #{{ campaignInternalId }})
+               * `fb5f05f4-ee4e-41a9-9370-14415bdc12ea` - Fehler: min. 1 Flight ist bereits fakturiert.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
+    delete:
+      tags: [CampaignDiscount]
+      summary: Delete a campaign discount
+      responses:
+        '204':
+          description: Campaign discount has been deleted.
+        '400':
+          description: >
+            Returns a list of errors in the input data. For this call the following violation codes can be expected errors:
+               * `d4c8a1b5-7492-4c65-833f-d3473dd76854` - Cannot delete a campaign discount that still has active flight discounts. Delete the flight discounts first. Flight discounts: {{ flightDiscountIdentifiers }}
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
+
+  /app-api/campaign/{campaignExternalId}/campaign-discount/{campaignDiscountExternalId}/flight-discount:
+    parameters:
+      - $ref: '#/components/parameters/ParamCampaignExternalId'
+      - $ref: '#/components/parameters/ParamCampaignDiscountExternalId'
+    get:
+      tags: [CampaignDiscount]
+      summary: Read flight discount of a flight that was created via API and has an externalId
+      responses:
+        '200':
+          description: Flight discount has been returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightDiscountRead'
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
 
     post:
-      tags: [CampaignFlight]
+      tags: [CampaignDiscount]
       summary: Create a flight discount
       requestBody:
         content:
@@ -313,14 +383,14 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
 
-  /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/flight-discount/{flightDiscountExternalId}:
+  /app-api/campaign/{campaignExternalId}/campaign-discount/{campaignDiscountExternalId}/flight-discount/{flightDiscountExternalId}:
     parameters:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
-      - $ref: '#/components/parameters/ParamFlightExternalId'
+      - $ref: '#/components/parameters/ParamCampaignDiscountExternalId'
       - $ref: '#/components/parameters/ParamFlightDiscountExternalId'
 
     patch:
-      tags: [CampaignFlight]
+      tags: [CampaignDiscount]
       summary: Update a flight discount
       requestBody:
         content:
@@ -349,7 +419,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
     delete:
-      tags: [CampaignFlight]
+      tags: [CampaignDiscount]
       summary: Delete a flight discount
       responses:
         '204':
@@ -738,62 +808,114 @@ components:
                 remarks:
                   type: string
 
-    FlightDiscountRead:
-      allOf:
-        - type: object
-          properties:
-            externalId:
-              type: string
-              example: myExternalId1234
-            name:
-              type: string
-              example: Special discount
-            amountPercent:
-              type: number
-              format: float
-              example: 5.5
-            amountSum:
-              type: number
-              format: float
-              example: 0
-
-    FlightDiscountCreate:
-      allOf:
-        - type: object
-          properties:
-            externalId:
-              type: string
-            name:
-              type: string
-            amountPercent:
-              type: number
-              format: float
-              example: 5.5
-            amountSum:
-              type: number
-              format: float
-              example: 0
-          required:
-            - externalId
-            - name
+    FlightDiscount:
+      type: object
+      properties:
+        flightExternalId:
+          description: this is the external id of the flight associated with this flight discount
+          type: string
+          example: flightExternalId12345
+        externalId:
+          description: this is the external id of this flight discount
+          type: string
+          example: flightDiscountExternalId1234
+        amountPercent:
+          type: number
+          example: 33.33
+        amountSum:
+          type: number
+          example: 0
+      oneOf:
+        - required:
             - amountPercent
+        - required:
             - amountSum
 
+    CampaignDiscountWrite:
+      type: object
+      properties:
+        name:
+          description: This name will appear e.g. in finance documents
+          type: string
+          example: "Great discount for john doe"
+        externalId:
+          type: string
+          example: "campaignDiscount12345"
+      required:
+        - name
+        - externalId
+
+    CampaignDiscountRead:
+      type: object
+      properties:
+        flightDiscounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlightDiscount"
+        name:
+          type: string
+          example: "Great discount for john doe"
+        externalId:
+          type: string
+          example: "campaignDiscount12345"
+
+    CampaignDiscountsRead:
+      type: object
+      properties:
+        campaignDiscounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/CampaignDiscountRead"
+
+    FlightDiscountRead:
+      type: object
+      properties:
+        flightExternalId:
+          type: string
+          example: flightExternalId1234
+        externalId:
+          type: string
+          example: flightDiscountExternalId1234
+        amountPercent:
+          type: number
+          format: float
+          example: 20.5
+        amountSum:
+          type: number
+          format: float
+          example: 0
+
+    FlightDiscountCreate:
+      properties:
+        flightExternalId:
+          type: string
+        externalId:
+          type: string
+        amountPercent:
+          type: number
+          format: float
+          example: 20.5
+        amountSum:
+          type: number
+          format: float
+          example: 0
+      required:
+        - flightExternalId
+        - externalId
+        - amountPercent
+        - amountSum
+
     FlightDiscountUpdate:
-      allOf:
-        - type: object
-          properties:
-            name:
-              type: string
-              example: Great discount
-            amountPercent:
-              type: number
-              format: float
-              example: 5.5
-            amountSum:
-              type: number
-              format: float
-              example: 0
+      type: object
+      properties:
+        amountPercent:
+          type: number
+          format: float
+          example: 5.5
+        amountSum:
+          type: number
+          format: float
+          example: 0
 
     PrimaryKeysRead:
       description: A primary key, item name list
@@ -1605,6 +1727,22 @@ components:
       required: true
       example: example-campaign
       description: "External ID of a campaign. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+    ParamCampaignDiscountExternalId:
+      in: path
+      name: campaignDiscountExternalId
+      schema:
+        type: string
+      required: true
+      example: campaignDiscountExternalId1234
+      description: "External ID of a campaign discount. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+    ParamFlightDiscountExternalId:
+      in: path
+      name: flightDiscountExternalId
+      schema:
+        type: string
+      required: true
+      example: flightDiscountExternalId1234
+      description: "External ID of a flight discount. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
     ParamFlightExternalId:
       in: path
       name: flightExternalId
@@ -1613,14 +1751,6 @@ components:
         type: string
       required: true
       description: "External ID of a flight. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
-    ParamFlightDiscountExternalId:
-      in: path
-      name: flightDiscountExternalId
-      example: example-flight-discount
-      schema:
-        type: string
-      required: true
-      description: "External ID of a discount. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
 
   responses:
     InternalServerErrorDefault:
