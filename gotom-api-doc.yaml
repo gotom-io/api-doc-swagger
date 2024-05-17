@@ -102,18 +102,23 @@ paths:
     post:
       tags: [Campaign]
       summary: Update the campaign by its external ID. All the properties are optional, only the supplied properties are changed.
-      description: Notice that when changing the customer, it will apply the new customer discounts automatically.
+      description: |
+        Notice that when changing the customer, it will apply the new customer discounts automatically. 
+        
+        When changing or setting agency/intermediator, by default, commissions will be set to the values found in the agency/intermediator again. Even if the commission was set on the flight. Updating agency/intermediator to `null` will, by default, set the commissions to `0` and the `commissionStatus` as well to `0`.
+        
+        When agency/intermediator are sent in the body and you don't want to update the commissions you can use the query parameter `update_commissions=0`.
       parameters:
         - in: query
           name: update_commissions
           schema:
             type: boolean
-            default: 0
+            default: 1
             enum: [ 0, 1 ]
           description: >
             Whether to update commissions or not
              * **0**: commissions will not be updated and stay the same even if agency and/or intermediator are changed. Flights created hereafter will use the old commissions.
-             * **1**: commissions will be updated only if the payload as well has values set for the intermediator or agency. Flights created hereafter will always use those commissions as well.
+             * **1**: commissions will be updated only if the payload as well has values set for the intermediator or agency. Flights created hereafter will always use those commissions as well. If you have set custom flight commissions manually on flights, they will be reset to the values of the agency/intermediator.
       requestBody:
         content:
           application/json:
@@ -495,7 +500,11 @@ paths:
                   description: Flight has not been found
       post:
           tags: [CampaignFlight]
-          summary: Set the commission status of a campaign
+          summary: Set the commission of a flight
+          description: |
+            Careful: Updating the campaign with a new agency/intermediator or with the same agency/intermediator will recalculate the commissions of that agency/intermediator and overwrite the flight commission set here.
+            
+            Read details in the update campaign endpoint.
           requestBody:
               content:
                   application/json:
@@ -508,7 +517,7 @@ paths:
                   description: The campaign does not exist
               '400':
                   description: >
-                      Returns a list of errors in the input data. For this call the following violation codes can be expected
+                    Returns a list of errors in the input data. For this call the following violation codes can be expected
                       * `6e40c9b1-7f75-4a3a-8149-26adecd9a5d4` - Commission update failed: Please provide either a percentage or amount for the commissions but not both
                       * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Error: Delta-Invoice exists
                       * `407eebae-cb0c-49fd-9708-4312452133ee` - Cannot change commission because flight is already invoiced
