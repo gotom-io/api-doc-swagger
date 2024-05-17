@@ -102,11 +102,10 @@ paths:
     post:
       tags: [Campaign]
       summary: Update the campaign by its external ID. All the properties are optional, only the supplied properties are changed.
-      description:
+      description: |
         Notice that when changing the customer, it will apply the new customer discounts automatically. 
         
         When changing or setting agency/intermediator, by default, commissions will be set to the values found in the agency/intermediator again. Even if the commission was set on the flight. Updating agency/intermediator to `null` will, by default, set the commissions to `0` and the `commissionStatus` as well to `0`.
-        
         
         When agency/intermediator are sent in the body and you don't want to update the commissions you can use the query parameter `update_commissions=0`.
       parameters:
@@ -502,9 +501,8 @@ paths:
       post:
           tags: [CampaignFlight]
           summary: Set the commission of a flight
-          description: >
+          description: |
             Careful: Updating the campaign with a new agency/intermediator or with the same agency/intermediator will recalculate the commissions of that agency/intermediator and overwrite the flight commission set here.
-            
             
             Read details in the update campaign endpoint.
           requestBody:
