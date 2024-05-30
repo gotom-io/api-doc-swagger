@@ -446,8 +446,8 @@ paths:
         '400':
           description: >
             Returns a list of errors in the input data. For this call the following violation codes can be expected
-            * `28a27691-46f0-4bc2-9806-100587d7a962` - The campaign was already billed, cannot archive / unarchive
-            * `e0a1561a-631e-4d1b-99fe-6a7e7f89b4dd` - The campaign was partially invoiced, cannot archive
+             * `28a27691-46f0-4bc2-9806-100587d7a962` - The campaign was already billed, cannot archive / unarchive
+             * `e0a1561a-631e-4d1b-99fe-6a7e7f89b4dd` - The campaign was partially invoiced, cannot archive
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
   
@@ -470,9 +470,9 @@ paths:
               '400':
                   description: >
                       Returns a list of errors in the input data. For this call the following violation codes can be expected
-                      * `48f7f665-0181-431c-a094-d6a09842690f` - Cannot change commission because flights were already invoiced in this campaign
-                      * `9bf0acca-73cf-448f-8907-bc70ae240b16` - The provided commission status value is invalid
-                      * `16a35de8-46dd-454d-9150-b11280782ff9` - Changes not allowed. Flight already deferred
+                       * `48f7f665-0181-431c-a094-d6a09842690f` - Cannot change commission because flights were already invoiced in this campaign
+                       * `9bf0acca-73cf-448f-8907-bc70ae240b16` - The provided commission status value is invalid
+                       * `16a35de8-46dd-454d-9150-b11280782ff9` - Changes not allowed. Flight already deferred
               '500':
                   $ref: '#/components/responses/InternalServerErrorDefault'
   
