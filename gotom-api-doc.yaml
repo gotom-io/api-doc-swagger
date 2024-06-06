@@ -851,13 +851,20 @@ components:
         flightDiscounts:
           type: array
           items:
-            $ref: "#/components/schemas/FlightDiscount"
+            $ref: "#/components/schemas/FlightDiscountRead"
         name:
           type: string
           example: "Great discount for john doe"
         externalId:
+          description: "Either `externalId` is set or `entityId` if no `externalId` was found. `entityId` is the internal goTom Id that is used in the goTom frontend."
           type: string
+          nullable: true
           example: "campaignDiscount12345"
+        entityId:
+          description: "Either `externalId` is set or `entityId` if no `externalId` was found. `entityId` is the internal goTom Id that is used in the goTom frontend."
+          type: number
+          nullable: true
+          example: null
 
     CampaignDiscountsRead:
       type: object
@@ -876,6 +883,13 @@ components:
         externalId:
           type: string
           example: flightDiscountExternalId1234
+          description: "Either `externalId` is set or `entityId` if no `externalId` was found. `entityId` is the internal goTom Id that is used in the goTom frontend."
+          nullable: true
+        entityId:
+          description: "Either `externalId` is set or `entityId` if no `externalId` was found. `entityId` is the internal goTom Id that is used in the goTom frontend."
+          type: number
+          nullable: true
+          example: null
         amountPercent:
           type: number
           format: float
