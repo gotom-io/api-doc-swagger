@@ -345,19 +345,6 @@ paths:
     parameters:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
       - $ref: '#/components/parameters/ParamCampaignDiscountExternalId'
-    get:
-      tags: [CampaignDiscount]
-      summary: Read flight discount of a flight that was created via API and has an externalId
-      responses:
-        '200':
-          description: Flight discount has been returned.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FlightDiscountRead'
-        '500':
-          $ref: '#/components/responses/InternalServerErrorDefault'
-
     post:
       tags: [CampaignDiscount]
       summary: Create a flight discount
@@ -393,6 +380,19 @@ paths:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
       - $ref: '#/components/parameters/ParamCampaignDiscountExternalId'
       - $ref: '#/components/parameters/ParamFlightDiscountExternalId'
+
+    get:
+      tags: [CampaignDiscount]
+      summary: Read flight discount of a flight that was created via API and has an externalId
+      responses:
+        '200':
+          description: Flight discount has been returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FlightDiscountRead'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
 
     patch:
       tags: [CampaignDiscount]
