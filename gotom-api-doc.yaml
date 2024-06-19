@@ -302,7 +302,7 @@ paths:
                * `0e31a231-9575-4430-8ab2-937bbd9e771d` - Flight with external ID '{{ flightExternalId }}' is already partly invoiced.
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
-  /app-api/campaign/{campaignExternalId}/campaign-discount/{campaignDiscountExternalId}:
+  /app-api/campaign/{campaignExternalId}/campaign-discount/{cDiscountEID}:
     parameters:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
       - $ref: '#/components/parameters/ParamCampaignDiscountExternalId'
@@ -341,7 +341,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
 
-  /app-api/campaign/{campaignExternalId}/campaign-discount/{campaignDiscountExternalId}/flight-discount:
+  /app-api/campaign/{campaignExternalId}/campaign-discount/{cDiscountEID}/flight-discount:
     parameters:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
       - $ref: '#/components/parameters/ParamCampaignDiscountExternalId'
@@ -376,7 +376,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
 
-  /app-api/campaign/{campaignExternalId}/campaign-discount/{campaignDiscountExternalId}/flight-discount/{flightDiscountExternalId}:
+  /app-api/campaign/{campaignExternalId}/campaign-discount/{cDiscountEID}/flight-discount/{fDiscountEID}:
     parameters:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
       - $ref: '#/components/parameters/ParamCampaignDiscountExternalId'
@@ -1757,7 +1757,7 @@ components:
       description: "External ID of a campaign. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
     ParamCampaignDiscountExternalId:
       in: path
-      name: campaignDiscountExternalId
+      name: cDiscountEID
       schema:
         type: string
       required: true
@@ -1765,7 +1765,7 @@ components:
       description: "External ID of a campaign discount. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
     ParamFlightDiscountExternalId:
       in: path
-      name: flightDiscountExternalId
+      name: fDiscountEID
       schema:
         type: string
       required: true
