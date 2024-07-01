@@ -8,7 +8,7 @@ paths:
     get:
       tags: [Primary-Keys]
       summary: Get a list of goTom primary keys with associated names to the provided entity.
-      description: The primary keys provided here are needed in other calls like to create CampaignFlight. It contains pagination after a 1000 max result limit.
+      description: The primary keys provided here are needed in other calls like to create CampaignFlight. It contains pagination after a 1000 max result limit. E-mail field is displayed only if user entity is requested.
       parameters:
         - in: path
           name: entity
@@ -16,6 +16,7 @@ paths:
           schema:
             type: string
             enum:
+              - user
               - tarif
               - priceType
               - adServer
@@ -51,7 +52,7 @@ paths:
                     properties:
                       msg:
                         type: string
-                        example: "'tarifffff' is not a valid entity. Valid entities are: 'adServer','tarif','priceType','campaignType','extraPriceLevel','platform','channel','media','advertising'"
+                        example: "'tarifffff' is not a valid entity. Valid entities are: 'user','adServer','tarif','priceType','campaignType','extraPriceLevel','platform','channel','media','advertising'"
   /app-api/campaign:
     post:
       tags: [Campaign]
@@ -976,13 +977,19 @@ components:
             properties:
               id:
                 description: The primary key of the item. This is always an integer except for entity `adServer`, where it is a string
+                required: true
                 oneOf:
                   - type: integer
                   - type: string
               name:
                 description: The associated name of the primary key. For example, the name of the channel.
                 type: string
+                required: true
                 example: Desktop
+              email:
+                description: The associated email of the primary key or User, this field is shown only if primary key for user entity is requested.
+                type: string
+                example: if_user_entity_given@gotom.io
 
     CampaignCreate:
       required:
