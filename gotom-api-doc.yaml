@@ -974,17 +974,18 @@ components:
           type: array
           items:
             type: object
+            required:
+              - id
+              - name
             properties:
               id:
                 description: The primary key of the item. This is always an integer except for entity `adServer`, where it is a string
-                required: true
                 oneOf:
                   - type: integer
                   - type: string
               name:
                 description: The associated name of the primary key. For example, the name of the channel.
                 type: string
-                required: true
                 example: Desktop
               email:
                 description: The associated email of the primary key or User, this field is shown only if primary key for user entity is requested.
@@ -1083,33 +1084,24 @@ components:
             type: string
 
     CampaignSalesMixin:
-      anyOf:
-        - oneOf:
-            - type: object
-              properties:
-                salesSupportId:
-                  description: Correspons with the field "Innendienst"
-                  type: integer
-                  example: 42
-            - type: object
-              properties:
-                salesSupportEmail:
-                  description: Correspons with the field "Innendienst"
-                  type: string
-                  example: sales-support@acme-corp.ch
-        - oneOf:
-            - type: object
-              properties:
-                salesId:
-                  description: Corresponds with the field "Verkauf"
-                  type: integer
-                  example: 23
-            - type: object
-              properties:
-                salesEmail:
-                  description: Corresponds with the field "Verkauf"
-                  type: string
-                  example: sales-support@acme-corp.ch
+      type: object
+      properties:
+        salesSupportId:
+          description: Correspons with the field "Innendienst". Only `salesSupportId` or `salesSupportEmail` should be provided.
+          type: integer
+          example: null
+        salesSupportEmail:
+          description: Correspons with the field "Innendienst". Only `salesSupportId` or `salesSupportEmail` should be provided.
+          type: string
+          example: sales-support@acme-corp.ch
+        salesId:
+          description: Corresponds with the field "Verkauf". Only `salesId` or `salesEmail` should be provided.
+          type: integer
+          example: 23
+        salesEmail:
+          description: Corresponds with the field "Verkauf".  Only `salesId` or `salesEmail` should be provided.
+          type: string
+          example: null
 
     FlightLineItemId:
       description: AdServer LineItem Connection
