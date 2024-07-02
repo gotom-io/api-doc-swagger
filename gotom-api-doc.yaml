@@ -974,19 +974,18 @@ components:
           type: array
           items:
             type: object
+            required:
+              - id
+              - name
             properties:
               id:
                 description: The primary key of the item. This is always an integer except for entity `adServer`, where it is a string
-                required: 
-                  - id
                 oneOf:
                   - type: integer
                   - type: string
               name:
                 description: The associated name of the primary key. For example, the name of the channel.
                 type: string
-                required: 
-                  - name
                 example: Desktop
               email:
                 description: The associated email of the primary key or User, this field is shown only if primary key for user entity is requested.
