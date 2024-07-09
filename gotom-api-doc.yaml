@@ -527,75 +527,75 @@ paths:
              * `e0a1561a-631e-4d1b-99fe-6a7e7f89b4dd` - The campaign was partially invoiced, cannot archive
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
-
+  
   /app-api/campaign/{campaignExternalId}/commission-status:
-    parameters:
-      - $ref: '#/components/parameters/ParamCampaignExternalId'
-    post:
-      tags: [Campaign]
-      summary: Set the commission status of a campaign
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CommissionStatus'
-      responses:
-        '204':
-          description: Commission status was updated successfully
-        '404':
-          description: The campaign does not exist
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-             * `48f7f665-0181-431c-a094-d6a09842690f` - Cannot change commission because flights were already invoiced in this campaign
-             * `9bf0acca-73cf-448f-8907-bc70ae240b16` - The provided commission status value is invalid
-             * `16a35de8-46dd-454d-9150-b11280782ff9` - Changes not allowed. Flight already deferred
-        '500':
-          $ref: '#/components/responses/InternalServerErrorDefault'
-
+      parameters:
+          - $ref: '#/components/parameters/ParamCampaignExternalId'
+      post:
+          tags: [Campaign]
+          summary: Set the commission status of a campaign
+          requestBody:
+              content:
+                  application/json:
+                      schema:
+                          $ref: '#/components/schemas/CommissionStatus'
+          responses:
+              '204':
+                  description: Commission status was updated successfully
+              '404':
+                  description: The campaign does not exist
+              '400':
+                  description: >
+                      Returns a list of errors in the input data. For this call the following violation codes can be expected
+                       * `48f7f665-0181-431c-a094-d6a09842690f` - Cannot change commission because flights were already invoiced in this campaign
+                       * `9bf0acca-73cf-448f-8907-bc70ae240b16` - The provided commission status value is invalid
+                       * `16a35de8-46dd-454d-9150-b11280782ff9` - Changes not allowed. Flight already deferred
+              '500':
+                  $ref: '#/components/responses/InternalServerErrorDefault'
+  
   /app-api/campaign/{campaignExternalId}/flight/{flightExternalId}/commission:
-    parameters:
-      -   $ref: '#/components/parameters/ParamCampaignExternalId'
-      -   $ref: '#/components/parameters/ParamFlightExternalId'
-    get:
-      tags: [ CampaignFlight ]
-      summary: Retrieve the flight's commission values by its external ID.
-      responses:
-        '200':
-          description: Returns the commission data
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/FlightCommission'
-
-        '404':
-          description: Flight has not been found
-    post:
-      tags: [CampaignFlight]
-      summary: Set the commission of a flight
-      description: |
-        Careful: Updating the campaign with a new agency/intermediator or with the same agency/intermediator will recalculate the commissions of that agency/intermediator and overwrite the flight commission set here.
-        
-        Read details in the update campaign endpoint.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/FlightCommission'
-      responses:
-        '204':
-          description: Commission was updated successfully
-        '404':
-          description: The campaign does not exist
-        '400':
-          description: >
-            Returns a list of errors in the input data. For this call the following violation codes can be expected
-              * `6e40c9b1-7f75-4a3a-8149-26adecd9a5d4` - Commission update failed: Please provide either a percentage or amount for the commissions but not both
-              * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Error: Delta-Invoice exists
-              * `407eebae-cb0c-49fd-9708-4312452133ee` - Cannot change commission because flight is already invoiced
-        '500':
-          $ref: '#/components/responses/InternalServerErrorDefault'
-
+      parameters:
+          -   $ref: '#/components/parameters/ParamCampaignExternalId'
+          -   $ref: '#/components/parameters/ParamFlightExternalId'
+      get:
+          tags: [ CampaignFlight ]
+          summary: Retrieve the flight's commission values by its external ID.
+          responses:
+              '200':
+                  description: Returns the commission data
+                  content:
+                      application/json:
+                          schema:
+                              $ref: '#/components/schemas/FlightCommission'
+              
+              '404':
+                  description: Flight has not been found
+      post:
+          tags: [CampaignFlight]
+          summary: Set the commission of a flight
+          description: |
+            Careful: Updating the campaign with a new agency/intermediator or with the same agency/intermediator will recalculate the commissions of that agency/intermediator and overwrite the flight commission set here.
+            
+            Read details in the update campaign endpoint.
+          requestBody:
+              content:
+                  application/json:
+                      schema:
+                          $ref: '#/components/schemas/FlightCommission'
+          responses:
+              '204':
+                  description: Commission was updated successfully
+              '404':
+                  description: The campaign does not exist
+              '400':
+                  description: >
+                    Returns a list of errors in the input data. For this call the following violation codes can be expected
+                      * `6e40c9b1-7f75-4a3a-8149-26adecd9a5d4` - Commission update failed: Please provide either a percentage or amount for the commissions but not both
+                      * `504d6c75-bacb-4319-ad0a-e942a30904f7` - Error: Delta-Invoice exists
+                      * `407eebae-cb0c-49fd-9708-4312452133ee` - Cannot change commission because flight is already invoiced
+              '500':
+                  $ref: '#/components/responses/InternalServerErrorDefault'
+                  
   /app-api/crm-sync-import-external-crm-id/update-customer:
     post:
       tags: [Customer]
@@ -1053,7 +1053,7 @@ components:
               nullable: true
               description: Reference for Campaign Type
               type: string
-
+              
             commissionStatus:
               description: Corresponds with the field "Kommissions-Abrechnung"
               type: integer
@@ -1431,11 +1431,11 @@ components:
           enum: [0, 2, 3, 4]
           example: 4
           description: >
-            Commission status:
-             * `0` - Commission direct
-             * `2` - AC direct, Agency rebate indirect (accrual)
-             * `3` - AC separate, Agency rebate indirect (accrual)
-             * `4` - Agency rebate separate
+              Commission status:
+               * `0` - Commission direct
+               * `2` - AC direct, Agency rebate indirect (accrual)
+               * `3` - AC separate, Agency rebate indirect (accrual)
+               * `4` - Agency rebate separate
 
     KeyValueSet:
       properties:
