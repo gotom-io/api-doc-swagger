@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.4.0
+  version: 4.4.1
   title: goTom API Documentation
 
 paths:
@@ -891,6 +891,7 @@ components:
         flightExternalId:
           type: string
           example: flightExternalId1234
+          nullable: true
         externalId:
           type: string
           example: flightDiscountExternalId1234
