@@ -15,9 +15,11 @@
 }
 
 .information-container hgroup {
-    background-image: url('https://www.gotom.io/wp-content/themes/gotom/lib/images/logos/circle-white.svg');
+    background-image: url('./gt-logo-neg-RGB.svg');
     background-repeat: no-repeat;
-    padding-left: 85px;
+    background-size: 120px;
+    background-position-y: center;
+    padding-left: 136px;
     height: 50px;
 }
 

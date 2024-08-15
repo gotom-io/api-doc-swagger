@@ -15,6 +15,13 @@ window.onload = function() {
     ],
     layout: "StandaloneLayout",
     supportedSubmitMethods: [],
+    onComplete: () => {
+        const titleNode = document.querySelector('.information-container .title');
+        if (titleNode) {
+            // remove the goTom prefix from the title, BECAUSE UX
+            titleNode.textContent = titleNode.textContent.replace(/^goTom\s*/, '');
+        }
+    },
   });
 
   //</editor-fold>
