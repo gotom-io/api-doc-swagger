@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.4.1
+  version: 4.4.2
   title: goTom API Documentation
 
 paths:
@@ -935,17 +935,21 @@ components:
 
     FlightDiscountUpdate:
       type: object
-      properties:
-        amountPercent:
-          type: number
-          format: float
-          nullable: true
-          example: 5.5
-        amountSum:
-          type: number
-          format: float
-          nullable: true
-          example: null
+      oneOf:
+        - required: [amountSum]
+          properties:
+            amountSum:
+              type: number
+              format: float
+              example: 5.5
+              nullable: false
+        - required: [amountPercent]
+          properties:
+            amountPercent:
+              type: number
+              format: float
+              nullable: false
+              example: 33.33
 
     PrimaryKeysRead:
       description: A primary key, item name list
