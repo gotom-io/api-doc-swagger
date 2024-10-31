@@ -9,7 +9,7 @@ paths:
   /app-api/crm-sync-import-external-crm-id/update-customer:
     post:
       tags: [Customer]
-      summary: Create or update (Upsert) a customer with addresses and contact persons
+      description: Create or update (Upsert) a customer with addresses and contact persons
       requestBody:
         content:
           application/json:
@@ -69,7 +69,7 @@ paths:
   /app-api/crm-sync-import-external-crm-id/error-logs/{jobId}:
     get:
       tags: [Customer]
-      summary: Read customer logs to see the current status of processing
+      description: Read customer logs to see the current status of processing
       parameters:
         - in: path
           name: jobId

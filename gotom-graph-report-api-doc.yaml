@@ -10,8 +10,9 @@ paths:
   /app-api/graph-export/download/{savedReportId}:
     get:
       tags: [GraphReport]
-      summary: Download graph report as csv. Careful - custom reports must be retrieved via other endpoint.
       description: >
+        Download graph report as csv. Careful - custom reports must be retrieved via other endpoint.
+        
         Useful links
           * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
           * [Php example code graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
@@ -67,8 +68,9 @@ paths:
   /app-api/custom-report-export/download/{savedReportId}:
     get:
       tags: [GraphReport]
-      summary: Download custom graph report as csv. Careful - normal graph reports must be retrieved via other endpoint.
       description: >
+        Download custom graph report as csv. Careful - normal graph reports must be retrieved via other endpoint.
+        
         * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
         * [Php example code custom graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
       parameters:
