@@ -1,0 +1,124 @@
+openapi: 3.0.0
+info:
+  version: 4.4.2
+  title: goTom API Documentation
+
+x-explorer-enabled: false # this disables the "try me" button for test requests on readme.com
+
+paths:
+
+  /app-api/graph-export/download/{savedReportId}:
+    get:
+      tags: [GraphReport]
+      summary: Download graph report as csv. Careful - custom reports must be retrieved via other endpoint.
+      description: >
+        Useful links
+          * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
+          * [Php example code graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
+
+      parameters:
+        - in: path
+          name: savedReportId
+          description: >
+            You get this report ID by saving a graph report. For example:
+             1. Go to [https://example.com/statistic/graph-report/show](https://example.com/statistic/graph-report/show), enter a name for the report and press save.
+             2. Read out the resulting `savedReportId` in the following page e.g. `https://example.com/statistic/graph-report/saved/46` where 46 is the `savedReportId`
+             3. Use the `savedReportId` to call this endpoint with e.g. `/app-api/graph-export/download/46`
+
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: The report as csv file
+          content:
+            text/csv;charset=UTF-8:
+              schema:
+                type: string
+                format: binary
+              example: |
+                "Column1","Column2","Column3"
+                "Value1","Value2","Value3"
+                "Value4","Value5","Value6"
+        '404':
+          description:
+            The report was not found. Did you save it and was it really a GraphReport (not CustomReport)? Correct environment test, staging or production?
+          content:
+            text/html:
+              schema:
+                type: string
+              example: |
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>404 Not Found</title>
+                </head>
+                <body>
+                    <h1>404 Not Found</h1>
+                    <p>The requested report could not be found.</p>
+                </body>
+                </html>
+        '500':
+          description: Reason maybe you tried to retrieve a custom report mistakenly over this endpoint instead of the other
+          content:
+            text/html; charset=UTF-8: {}
+
+  /app-api/custom-report-export/download/{savedReportId}:
+    get:
+      tags: [GraphReport]
+      summary: Download custom graph report as csv. Careful - normal graph reports must be retrieved via other endpoint.
+      description: >
+        * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
+        * [Php example code custom graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
+      parameters:
+        - in: path
+          name: savedReportId
+          description: >
+            You get this report ID by saving a graph report. For example:
+             1. Go to [https://example.com/statistic/customreport](https://example.com/statistic/customreport), enter a name for the report and press save.
+             2. Read out the resulting `savedReportId` in the following page e.g. `https://example.com/statistic/customreport?saved_report_id=47` where 47 is the `savedReportId`
+             3. Use the `savedReportId` to call this endpoint with e.g. `/app-api/custom-report-export/download/47`
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: The report as csv file
+          content:
+            text/csv;charset=UTF-8:
+              schema:
+                type: string
+                format: binary
+              example: |
+                "Column1","Column2","Column3"
+                "Value1","Value2","Value3"
+                "Value4","Value5","Value6"
+        '404':
+          description:
+            The report was not found. Did you save it and was it really a CustomReport (not GraphReport)? Correct environment test, staging or production?
+          content:
+            text/html:
+              schema:
+                type: string
+              example: |
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>404 Not Found</title>
+                </head>
+                <body>
+                    <h1>404 Not Found</h1>
+                    <p>The requested report could not be found.</p>
+                </body>
+                </html>
+
+
+components:
+  schemas:
+    {}
+  parameters:
+    {}
+  responses:
+    {}
