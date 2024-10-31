@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   version: 4.4.2
-  title: goTom API Documentation
+  title: goTom Campaign API
 
 x-explorer-enabled: false # this disables the "try me" button for test requests on readme.com
 
@@ -179,7 +179,7 @@ paths:
   /app-api/campaign/{campaignExternalId}/flight-lineitemid/{flightExternalId}:
     get:
       tags: [CampaignFlight]
-      summary: Retrieve the Flight LineItem Ids and Strategy Ids if it is connected with an AdServer
+      summary: Retrieve the Flight LineItem Ids and Strategy Ids
       parameters:
         - in: path
           name: campaignExternalId
