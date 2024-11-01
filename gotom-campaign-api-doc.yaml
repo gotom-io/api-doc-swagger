@@ -94,7 +94,7 @@ paths:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
     get:
       tags: [Campaign]
-      summary: Retrieve the campaign by its external ID
+      summary: Retrieve a campaign
       responses:
         '200':
           description: Return the campaign data
@@ -478,7 +478,8 @@ paths:
           description: Flight has not been found
     post:
       tags: [CampaignFlightSubline]
-      summary: Create/Update the sublines for a flight. This endpoint only available if the marketer network module is active.
+      summary: Create/Update the flight's sublines
+      description: Create/Update the sublines for a flight. This endpoint only available if the marketer network module is active.
       requestBody:
         content:
           application/json:
@@ -582,7 +583,7 @@ paths:
                   description: Flight has not been found
       post:
           tags: [CampaignFlight]
-          summary: Set the commission of a flight
+          summary: Set the flight's commission
           description: |
             Careful: Updating the campaign with a new agency/intermediator or with the same agency/intermediator will recalculate the commissions of that agency/intermediator and overwrite the flight commission set here.
             
