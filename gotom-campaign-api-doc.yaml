@@ -9,8 +9,11 @@ paths:
   /app-api/primary-keys/{entity}:
     get:
       tags: [Primary-Keys]
-      summary: Get a list of goTom primary keys with associated names to the provided entity.
-      description: The primary keys provided here are needed in other calls like to create CampaignFlight. It contains pagination after a 1000 max result limit. E-mail field is displayed only if user entity is requested.
+      summary: Get a list of goTom primary keys with names
+      description: > 
+        Get a list of goTom primary keys with associated names to the provided entity.
+        The primary keys provided here are needed in other calls like to create CampaignFlight.
+        It contains pagination after a 1000 max result limit. E-mail field is displayed only if user entity is requested.
       parameters:
         - in: path
           name: entity
@@ -58,7 +61,7 @@ paths:
   /app-api/campaign:
     post:
       tags: [Campaign]
-      summary: Create the campaign by its external ID.
+      summary: Create a campaign
       description:
         Create the campaign by its external ID. Flights that will be created on this campaign will have the agency or intermediator commission as well discounts applied to them.
       requestBody:
@@ -104,8 +107,10 @@ paths:
 
     post:
       tags: [Campaign]
-      summary: Update the campaign by its external ID. All the properties are optional, only the supplied properties are changed.
+      summary: Update a campaign
       description: |
+        All the properties are optional, only the supplied properties are changed.
+        
         Notice that when changing the customer, it will apply the new customer discounts automatically. 
         
         When changing or setting agency/intermediator, by default, commissions will be set to the values found in the agency/intermediator again. Even if the commission was set on the flight. Updating agency/intermediator to `null` will, by default, set the commissions to `0` and the `commissionStatus` as well to `0`.
@@ -179,7 +184,7 @@ paths:
   /app-api/campaign/{campaignExternalId}/flight-lineitemid/{flightExternalId}:
     get:
       tags: [CampaignFlight]
-      summary: Retrieve the Flight LineItem Ids and Strategy Ids
+      summary: Retrieve a flight LineItem IDs and Strategy IDs
       parameters:
         - in: path
           name: campaignExternalId
@@ -207,7 +212,7 @@ paths:
       - $ref: '#/components/parameters/ParamFlightExternalId'
     get:
       tags: [CampaignFlight]
-      summary: Retrieve the flight by its external ID
+      summary: Retrieve a flight
       responses:
         '200':
           description: Return the campaign data
@@ -219,7 +224,8 @@ paths:
           description: Flight has not been found
     post:
       tags: [CampaignFlight]
-      summary: Update the flight by its external ID. All the properties are optional, only the supplied properties are changed.
+      summary: Update the flight
+      description: Update the flight. All the properties are optional, only the supplied properties are changed.
       requestBody:
         content:
           application/json:
@@ -244,7 +250,7 @@ paths:
 
     delete:
       tags: [CampaignFlight]
-      summary: Delete the flight by its external ID
+      summary: Delete a flight
       responses:
         '204':
           description: Flight has been deleted
@@ -387,7 +393,8 @@ paths:
 
     get:
       tags: [CampaignDiscount]
-      summary: Read flight discount of a flight that was created via API and has an externalId
+      summary: Read a flight discount
+      description: Read a flight discount of a flight that was created via API and has an externalId
       responses:
         '200':
           description: Flight discount has been returned.
@@ -457,7 +464,8 @@ paths:
       - $ref: '#/components/parameters/ParamFlightExternalId'
     get:
       tags: [CampaignFlightSubline]
-      summary: Retrieve the flight's sublines by its external ID. This endpoint only available if the marketer network module is active.
+      summary: Retrieve the flight's sublines
+      description: Retrieve the flight's sublines. This endpoint only available if the marketer network module is active.
       responses:
         '200':
           description: Return the campaign data
@@ -494,7 +502,7 @@ paths:
       - $ref: '#/components/parameters/ParamCampaignExternalId'
     post:
       tags: [Campaign]
-      summary: Create a new campaign document for an existing campaign.
+      summary: Create a new campaign document
       requestBody:
         content:
           application/json:
@@ -561,7 +569,7 @@ paths:
           -   $ref: '#/components/parameters/ParamFlightExternalId'
       get:
           tags: [ CampaignFlight ]
-          summary: Retrieve the flight's commission values by its external ID.
+          summary: Retrieve the flight's commission
           responses:
               '200':
                   description: Returns the commission data
@@ -1562,7 +1570,7 @@ components:
         type: string
       required: true
       example: example-campaign
-      description: "External ID of a campaign. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+      description: "External ID of a campaign. See: [Good and Bad External IDs](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
     ParamCampaignDiscountExternalId:
       in: path
       name: cDiscountEID
@@ -1570,7 +1578,7 @@ components:
         type: string
       required: true
       example: campaignDiscountExternalId1234
-      description: "External ID of a campaign discount. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+      description: "External ID of a campaign discount. See: [Good and Bad External IDs](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
     ParamFlightDiscountExternalId:
       in: path
       name: fDiscountEID
@@ -1578,7 +1586,7 @@ components:
         type: string
       required: true
       example: flightDiscountExternalId1234
-      description: "External ID of a flight discount. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+      description: "External ID of a flight discount. See: [Good and Bad External IDs](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
     ParamFlightExternalId:
       in: path
       name: flightExternalId
@@ -1586,7 +1594,7 @@ components:
       schema:
         type: string
       required: true
-      description: "External ID of a flight. See: [Good and Bad External Ids](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
+      description: "External ID of a flight. See: [Good and Bad External IDs](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/campaign/good_and_bad_external_ids.md)"
 
   responses:
     InternalServerErrorDefault:

@@ -69,7 +69,8 @@ paths:
   /app-api/crm-sync-import-external-crm-id/error-logs/{jobId}:
     get:
       tags: [Customer]
-      summary: Read customer logs to see the current status of processing
+      summary: Read customer import logs
+      description: Read customer import logs to see the current status of processing
       parameters:
         - in: path
           name: jobId
