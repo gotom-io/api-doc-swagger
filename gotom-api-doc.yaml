@@ -1128,7 +1128,7 @@ components:
           description: The log that shows what lead to a warning when processing the request e.g. providing not all possible fields with their values or providing fields with values that are not configured and thus not read.
           nullable: true
           type: array
-          example: ['Data key contacts provided for type AppBundle\Entity\Customer, but is not a configured attribute. contacts will be ignored. Let the client know, that this attribute should be removed from his request.','Data key id not provided for type AppBundle\Entity\Customer, but is a configured attribute. Did the client forget to send it?']
+          example: ['Data key contactPersons provided for type AppBundle\Entity\Customer, but is not a configured attribute. contactPersons will be ignored. Let the client know, that this attribute should be removed from his request.','Data key id not provided for type AppBundle\Entity\Customer, but is a configured attribute. Did the client forget to send it?']
           items:
             type: string
 
@@ -1671,7 +1671,7 @@ components:
                 externalCrmId:
                   description: External CRM Id for referencing the address. If a record with this externalCrmId does not exist, an empty one will be created.
                   type: string
-            contacts:
+            contactPersons:
               description: Customer contacts
               type: array
               items:
