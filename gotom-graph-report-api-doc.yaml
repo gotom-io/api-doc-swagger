@@ -15,8 +15,8 @@ paths:
         Careful - custom reports must be retrieved via other endpoint.
         
         Useful links
-          * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
-          * [Php example code graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
+          * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](/docs/general-process-request-user-and-access)
+          * [Php example code graph export](/docs/example-graph-report-call-with-php)
 
       parameters:
         - in: path
@@ -73,8 +73,9 @@ paths:
       description: >
         Careful - normal graph reports must be retrieved via other endpoint.
         
-        * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/general/general-process.md)
-        * [Php example code custom graph export](https://github.com/gotom-io/api-doc-swagger/blob/master/api-doc-supplements/graph-export/php-examples/graph-export-general.md)
+        * [Introduction, Order API user, Requirements, End Points, Authentication, Up-to-dateness of the data, Contact](/docs/graphreport-actuality-of-the-data)
+        * [Php example code custom graph export](/docs/example-graph-report-call-with-php)
+        * [General code examples](/docs/example-api-call-code)
       parameters:
         - in: path
           name: savedReportId
