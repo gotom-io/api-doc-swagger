@@ -799,8 +799,8 @@ components:
                 externalCrmId:
                   description: External CRM Id for referencing the address. If a record with this externalCrmId does not exist, an empty one will be created.
                   type: string
-            contacts:
-              description: Customer contacts
+            contactPersons:
+              description: Customer contactPersons
               type: array
               items:
                 type: object
