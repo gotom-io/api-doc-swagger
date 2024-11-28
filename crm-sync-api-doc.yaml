@@ -151,7 +151,10 @@ components:
           required: [externalCrmId, firm, status, statusEc, language, mainAddress]
           properties:
             externalCrmId:
-              description: External CRM Id for referencing the customer
+              description: External CRM Id for referencing the customer, the important ID of the CRM sync API.
+              type: string
+            externalId:
+              description: Not to be confused with externalCrmId, externalId is not important for the CRM sync API. It could be used to reference again something else.
               type: string
             firm:
               description: Name of the customer
