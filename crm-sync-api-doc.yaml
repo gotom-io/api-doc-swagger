@@ -234,7 +234,7 @@ components:
                   description: Name of the industry. Will update the industry name for every customer that uses the same industry.
                   type: string
             addresses:
-              description: Customer addresses. Addresses added here are merged to existing ones (upsert). Existing ones can not be deleted.
+              description: Customer addresses. Addresses added through this endpoint are merged with existing ones (upsert). Deleting existing addresses is not supported.
               type: array
               items:
                 type: object
@@ -298,7 +298,7 @@ components:
                   description: External CRM Id for referencing the address. If a record with this externalCrmId does not exist, an empty one will be created.
                   type: string
             contacts:
-              description: Customer contacts. Contacts added here are merged to existing ones (upsert). Existing ones can not be deleted. Why? Deletion can under circumstances lead to an error because the contact is referenced already. This replaces the deprecated <s>contactPersons</s> property.
+              description: Customer contacts. Contacts added through this endpoint are merged with existing ones (upsert). Deleting existing contacts is not supported, as they may already be referenced elsewhere, which could cause errors. This functionality replaces the deprecated <s>contactPersons</s> property.
               type: array
               items:
                 type: object
