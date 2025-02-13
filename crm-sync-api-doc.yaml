@@ -331,6 +331,13 @@ components:
                     type: string
                     default: A
                     enum: ['A', 'N']
+                  lead:
+                    description: |
+                      Mark contact as lead. 
+                      * `true`: contact is marked as lead. 
+                      * `false`: contact is not marked as lead.
+                    type: boolean
+                    default: false
                   jobFunctions:
                     description: Function name
                     type: array
