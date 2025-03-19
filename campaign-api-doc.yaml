@@ -966,6 +966,9 @@ components:
         noteReservation:
           description: Corresponds with the Field "Reservationsabklärung"
           type: string
+        pdfInvoiceWithAttachment:
+          description: Corresponds with the Field "Dokumente"
+          type: boolean  
 
     CampaignUpdate:
       allOf:
