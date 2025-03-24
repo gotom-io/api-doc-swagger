@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.4.3
+  version: 4.4.5
   title: goTom CRM Sync API
 
 x-explorer-enabled: false # this disables the "try me" button for test requests on readme.com
@@ -351,6 +351,15 @@ components:
                           enum: ['de']
                         function:
                           description: The function name
+                          type: string
+                  pipelineStatus:
+                    description: The pipeline status is defined in the CRM Part of Admin Center.
+                    type: object
+                    items:
+                      type: object
+                      properties:
+                        externalCrmId:
+                          description: this refers to the pipeline externalCrmId defined in admin center, an incorrect externalCrmId will trigger a warning message, and ignore the pipelineStatus entry.
                           type: string
             tags:
               description: Customer tags
