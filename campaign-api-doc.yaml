@@ -966,6 +966,10 @@ components:
         noteReservation:
           description: Corresponds with the Field "Reservationsabklärung"
           type: string
+        pdfInvoiceWithAttachment:
+          description: Corresponds to the "Dokumente" field. If true, the invoice will be created with an appendix e.g. the Order Confirmation; if false, it will be created without one, as default it would be true.
+          type: boolean
+          default: true
 
     CampaignUpdate:
       allOf:
