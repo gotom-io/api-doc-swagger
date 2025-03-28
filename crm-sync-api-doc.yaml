@@ -353,13 +353,14 @@ components:
                           description: The function name
                           type: string
                   pipelineStatus:
-                    description: The pipeline status is defined in the CRM Part of Admin Center.
+                    description: Pipeline statuses are statuses that are created individually and can be assigned to a contact. A pipeline status can help to process leads and/or contacts and divide them into individual stages. If set to null, will remove the pipeline status from the contact. The pipeline status is defined in the CRM Part of Admin Center.
                     type: object
+                    nullable: true
                     items:
                       type: object
                       properties:
                         externalCrmId:
-                          description: this refers to the pipeline externalCrmId defined in admin center, an incorrect externalCrmId will trigger a warning message, and ignore the pipelineStatus entry.
+                          description: This refers to the pipeline externalCrmId defined in admin center, an incorrect externalCrmId will trigger a warning message, and ignore the pipelineStatus entry.
                           type: string
             tags:
               description: Customer tags
