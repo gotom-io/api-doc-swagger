@@ -1097,11 +1097,13 @@ components:
         externalId:
           type: string
         amountPercent:
+          description: "Note: The schemas used for creating and updating flight discounts differ for `amountPercent` and `amountSum`."
           type: number
           format: float
           example: 20.5
           nullable: true
         amountSum:
+          description: "Note: The schemas used for creating and updating flight discounts differ for `amountPercent` and `amountSum`."
           type: number
           format: float
           example: null
@@ -1114,10 +1116,12 @@ components:
 
     FlightDiscountUpdate:
       type: object
+      description: When updating, only one of `amountSum` or `amountPercent` should be provided — never both.
       oneOf:
         - required: [amountSum]
           properties:
             amountSum:
+              description: Must not be null. When updating, only one of `amountSum` or `amountPercent` should be provided — never both.
               type: number
               format: float
               example: 5.5
@@ -1125,6 +1129,7 @@ components:
         - required: [amountPercent]
           properties:
             amountPercent:
+              description: Must not be null. When updating, only one of `amountSum` or `amountPercent` should be provided — never both.
               type: number
               format: float
               nullable: false
