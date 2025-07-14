@@ -31,6 +31,7 @@ paths:
               - channel
               - media
               - advertising
+              - flightPositionType
           required: true
         - in: query
           name: page
@@ -178,6 +179,7 @@ paths:
                find out which property caused the error
              * `e3a1d7f7-4fcf-4b7d-8d87-38a60126462f` - The combination of `platformId`, `channelId` and `advertisingId` does not exist
              * `409d70bf-376e-4a21-a8d0-f75a4a6a7abc` - There is no price entry found for the combination of `platformId`, `channelId`, `advertisingId`, `tarifId`, `extraPriceLevelId` and `priceTypeId` does not exist
+             * `3d3b78ef-1595-47a3-b85d-20a5ee9a873c` - Flight is already fully invoiced
         '500':
           $ref: '#/components/responses/InternalServerErrorDefault'
 
@@ -1180,6 +1182,10 @@ components:
                 description: The associated email of the primary key or User, this field is shown only if primary key for user entity is requested.
                 type: string
                 example: if_user_entity_given@gotom.io
+              isDefault:
+                description: Whether the flightPositionType is the default value or not, only for flightPositionType
+                type: boolean
+                example: true
 
     CampaignCreate:
       required:
@@ -1327,6 +1333,12 @@ components:
           description: Corresponds with the field "Preistyp"
           type: integer
 
+        flightPositionType:
+          description: The ID of the flightPositionType that can be looked up using the primary key endpoint. Notice that even when setting to null, a default value might be used in the app as seen in the primary key endpoint. 
+            Notice as well that on read, the name is returned instead of the ID.
+          type: integer
+          nullable: true
+
         units:
           description: Corresponds with the field "Anzahl Einheiten"
           type: integer
@@ -1410,7 +1422,11 @@ components:
     FlightRead:
       allOf:
         - $ref: "#/components/schemas/FlightCreate"
-
+      properties:
+        flightPositionType:
+          description: Notice that even when setting to null, a default value might be used in the app as seen in the primary key endpoint. When reading the flight, not the ID is returned but the actual string value stored in the `flightPositionType` when creating the flight
+          type: string
+          nullable: true
     FlightSublines:
       description: Represents the sublines for a flight (only for network flights)
       type: object
