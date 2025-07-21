@@ -1333,13 +1333,12 @@ components:
           description: Corresponds with the field "Preistyp"
           type: integer
 
-        flightPositionType:
+        flightPositionTypeName:
           description: |
-            The ID of the `flightPositionType`, which can be retrieved via the primary key endpoint.
+            The `flightPositionTypeName`, which can be retrieved via the primary key endpoint.
             Note that even when this value is set to `null`, the application may use a default value, as shown in the primary key endpoint.
       
-            Also, when reading this value, the API returns the `name` rather than the ID.
-            If no value is set, the read response will include the default `flightPositionType`.
+            If no value is set, the read response will include the default `flightPositionTypeName`.
             Therefore, setting this field to `null` causes the flight to fall back to the default value.
           type: integer
           nullable: true
@@ -1428,8 +1427,8 @@ components:
       allOf:
         - $ref: "#/components/schemas/FlightCreate"
       properties:
-        flightPositionType:
-          description: Notice that even when setting to null, a default value might be used in the app as seen in the primary key endpoint. When reading the flight, not the ID is returned but the actual string value stored in the `flightPositionType` when creating the flight. The flight read returns the default value.
+        flightPositionTypeName:
+          description: Notice that even when setting to null, a default value might be used in the app as seen in the primary key endpoint. The flight read returns the default value.
           type: string
           nullable: true
     FlightSublines:
