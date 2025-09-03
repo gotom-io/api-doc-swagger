@@ -704,15 +704,18 @@ components:
             externalCrmId:
               description: External CRM Id for referencing the customer, the important ID of the CRM sync API.
               type: string
+              nullable: true
             externalId:
               description: Not to be confused with externalCrmId, externalId is not important for the CRM sync API. It could be used to reference again something else.
               type: string
+              nullable: true
             firm:
               description: Name of the customer
               type: string
             mwst:
               description: VAT Number
               type: string
+              nullable: true
             note:
               description: Note on the client
               type: string
@@ -731,18 +734,23 @@ components:
             bankAccountNumber:
               description: Bank Account Number for this customer
               type: string
+              nullable: true
             bankIBANNumber:
               description: IBAN for this customer
               type: string
+              nullable: true
             bankClearingNumber:
               description: Bank Clearing for this customer
               type: string
+              nullable: true
             bankName:
               description: Bank name for this customer
               type: string
+              nullable: true
             searchstring:
               description: Search help to find this customer easier with other name(s)
               type: string
+              nullable: true
             vatType:
               description: VAT Type (0 = Standard, 2 = VAT exempt, 3 = VAT reduced, 7 = VAT exempt embassy)
               type: integer
@@ -776,13 +784,15 @@ components:
             industry:
               description: Customer industry
               type: object
+              nullable: true
               required: [ externalCrmId ]
               properties:
                 externalCrmId:
                   description: External CRM Id for referencing the industry
                   type: string
+                  nullable: true
                 name:
-                  description: Name of the industry. Will update the industry name for every customer that uses the same industry.
+                  description: Name of the industry
                   type: string
             addresses:
               description: Customer addresses. Addresses added through this endpoint are merged with existing ones (upsert). Deleting existing addresses is not supported.
@@ -826,12 +836,15 @@ components:
                   externalId:
                     description: External Id
                     type: integer
+                    nullable: true
                   sendingRule:
                     description: Invoice sending rule. Default is defined via admin center setting
+                    nullable: true
                     type: string
                     enum: [ 'email', 'post' ]
                   sendingRuleAddresses:
                     description: E-Mail addresses for invoice sending. Only useful with sendingRule "email".
+                    nullable: true
                     type: array
                     items:
                       type: string
@@ -844,12 +857,14 @@ components:
               description: Reference to the main address for this customer
               type: object
               required: [ externalCrmId ]
+              nullable: true
               properties:
                 externalCrmId:
-                  description: External CRM Id for referencing the address. If a record with this externalCrmId does not exist, an empty one will be created.
+                  description: External CRM Id for referencing the address.
                   type: string
+                  nullable: true
             contacts:
-              description: Customer contacts. Contacts added through this endpoint are merged with existing ones (upsert). Deleting existing contacts is not supported, as they may already be referenced elsewhere, which could cause errors. This functionality replaces the deprecated <s>contactPersons</s> property.
+              description: Customer contacts
               type: array
               items:
                 type: object
@@ -884,7 +899,7 @@ components:
                     enum: [ 'A', 'N' ]
                   lead:
                     description: |
-                      Mark contact as lead. 
+                      Contact is: 
                       * `true`: contact is marked as lead. 
                       * `false`: contact is not marked as lead.
                     type: boolean
@@ -897,32 +912,34 @@ components:
                       required: [ lang, function ]
                       properties:
                         lang:
-                          description: Language in which the function is saved (deprecated). Use "de" always
+                          description: Language in which the function is used (deprecated). Use "de" always
                           type: string
                           enum: [ 'de' ]
                         function:
                           description: The function name
                           type: string
                   pipelineStatus:
-                    description: Pipeline statuses are statuses that are created individually and can be assigned to a contact. A pipeline status can help to process leads and/or contacts and divide them into individual stages. If set to null, will remove the pipeline status from the contact. The pipeline status is defined in the CRM Part of Admin Center.
+                    description:  A pipeline status can help to process leads and/or contacts and divide them into individual stages. The pipeline status is defined in the CRM Part of Admin Center.
                     type: object
                     nullable: true
                     properties:
                       externalCrmId:
-                        description: This refers to the pipeline externalCrmId defined in admin center, an incorrect externalCrmId will trigger a warning message, and ignore the pipelineStatus entry.
+                        description: This refers to the pipeline externalCrmId defined in admin center.
                         type: string
+                        nullable: true
             tags:
               description: Customer tags
               type: array
               items:
                 type: object
-                required: [ externalCrmId ]
+                required: [ externalCrmId, name ]
                 properties:
                   externalCrmId:
                     description: External CRM Id for referencing the tag
                     type: string
+                    nullable: true
                   name:
-                    description: Name of the tag (if this property is set, it will update the name of the tag for every customer)
+                    description: Name of the tag
                     type: string
             references:
               description: Customer references
@@ -967,12 +984,15 @@ components:
                 cashDiscountDays:
                   description: How many days that a cash discount (skonto) can be applied
                   type: integer
+                  nullable: true
                 cashDiscountPercent:
                   description: Percentage of cash discount (skonto) that can be applied
                   type: number
+                  nullable: true
                 billingPhrases:
                   description: Text to print on invoice in different languages
                   type: object
+                  nullable: true
                   properties:
                     de:
                       description: German text
@@ -1024,6 +1044,7 @@ components:
         note:
           description: Corresponds with the Field "Bemerkungen"
           type: string
+          nullable: true
         noteInternal:
           description: Corresponds with the Field "Interne Bemerkungen"
           type: string
