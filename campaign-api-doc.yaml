@@ -609,6 +609,31 @@ paths:
               '500':
                   $ref: '#/components/responses/InternalServerErrorDefault'
 
+  /app-api/customer/{customerCrmExternalId}:
+    parameters:
+      -   $ref: '#/components/parameters/ParamCustomerExternalCrmId'
+    get:
+      tags: [Customer]
+      summary: Retrieve a customer
+      description:
+        Retrieves a customer data object including it's default discounts. For writing a customer you should look inside the GoTom CRM Sync API.
+      responses:
+        '200':
+          description: Customer has been retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerFoundResponse'
+        '404':
+          description: >
+            No Customer found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoCustomerFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorDefault'
+
 components:
   schemas:
     ContactRef: # if you update this, be sure to update the equivalent in the other yaml files
@@ -649,6 +674,25 @@ components:
           description: External CRM ID of the person for this contact (corresponds to the "Kontakt" field)
           type: string
           nullable: true
+    CustomerRead:
+      allOf:
+        - $ref: '#/components/schemas/Customer'
+        - type: object
+          properties:
+            defaultDiscounts:
+              description: List of default discounts for the customer
+              type: array
+              items:
+                type: object
+                required: [name, percent]
+                properties:
+                  name:
+                    type: string
+                    example: Friendly Discount 1
+                  percent:
+                    type: number
+                    format: float
+                    example: 12.25
 
     Customer: # if you update this, be sure to update as well the other yaml files
       properties:
@@ -658,7 +702,10 @@ components:
           required: [ externalCrmId, firm, status, statusEc, language, mainAddress ]
           properties:
             externalCrmId:
-              description: External CRM Id for referencing the customer
+              description: External CRM Id for referencing the customer, the important ID of the CRM sync API.
+              type: string
+            externalId:
+              description: Not to be confused with externalCrmId, externalId is not important for the CRM sync API. It could be used to reference again something else.
               type: string
             firm:
               description: Name of the customer
@@ -738,7 +785,7 @@ components:
                   description: Name of the industry. Will update the industry name for every customer that uses the same industry.
                   type: string
             addresses:
-              description: Customer addresses
+              description: Customer addresses. Addresses added through this endpoint are merged with existing ones (upsert). Deleting existing addresses is not supported.
               type: array
               items:
                 type: object
@@ -801,8 +848,8 @@ components:
                 externalCrmId:
                   description: External CRM Id for referencing the address. If a record with this externalCrmId does not exist, an empty one will be created.
                   type: string
-            contactPersons:
-              description: Customer contactPersons
+            contacts:
+              description: Customer contacts. Contacts added through this endpoint are merged with existing ones (upsert). Deleting existing contacts is not supported, as they may already be referenced elsewhere, which could cause errors. This functionality replaces the deprecated <s>contactPersons</s> property.
               type: array
               items:
                 type: object
@@ -835,6 +882,13 @@ components:
                     type: string
                     default: A
                     enum: [ 'A', 'N' ]
+                  lead:
+                    description: |
+                      Mark contact as lead. 
+                      * `true`: contact is marked as lead. 
+                      * `false`: contact is not marked as lead.
+                    type: boolean
+                    default: false
                   jobFunctions:
                     description: Function name
                     type: array
@@ -849,6 +903,14 @@ components:
                         function:
                           description: The function name
                           type: string
+                  pipelineStatus:
+                    description: Pipeline statuses are statuses that are created individually and can be assigned to a contact. A pipeline status can help to process leads and/or contacts and divide them into individual stages. If set to null, will remove the pipeline status from the contact. The pipeline status is defined in the CRM Part of Admin Center.
+                    type: object
+                    nullable: true
+                    properties:
+                      externalCrmId:
+                        description: This refers to the pipeline externalCrmId defined in admin center, an incorrect externalCrmId will trigger a warning message, and ignore the pipelineStatus entry.
+                        type: string
             tags:
               description: Customer tags
               type: array
@@ -1507,6 +1569,38 @@ components:
           type: string
           example: Internal Server Error
 
+    CustomerFoundResponse:
+      properties:
+        ok:
+          type: boolean
+          enum: [true]
+          example: true
+          description: Always `true` for this response
+        customer:
+          $ref: '#/components/schemas/CustomerRead'
+      required:
+        - ok
+        - customer
+
+    NoCustomerFoundResponse:
+      properties:
+        ok:
+          type: boolean
+          enum: [false]
+          example: false
+          description: Always `false` for this response
+        message:
+          type: string
+          example: Customer not found with externalCrmId example1234ab
+        customer:
+          nullable: true
+          enum: [null]
+          description: Always `null` for this response
+      required:
+        - ok
+        - message
+        - customer
+
     ConstraintViolationResponse:
       properties:
         errors:
@@ -1593,6 +1687,14 @@ components:
           type: string
 
   parameters: # we are still on components level here
+    ParamCustomerExternalCrmId:
+      in: path
+      name: customerCrmExternalId
+      schema:
+        type: string
+      required: true
+      example: example-customer1234
+      description: "External CRM ID of a customer."
     ParamCampaignExternalId:
       in: path
       name: campaignExternalId
