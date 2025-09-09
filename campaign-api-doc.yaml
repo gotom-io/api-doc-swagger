@@ -674,338 +674,346 @@ components:
           description: External CRM ID of the person for this contact (corresponds to the "Kontakt" field)
           type: string
           nullable: true
-    CustomerRead:
-      allOf:
-        - $ref: '#/components/schemas/Customer'
-        - type: object
-          properties:
-            defaultDiscounts:
-              description: List of default discounts for the customer
-              type: array
-              items:
-                type: object
-                required: [name, percent]
-                properties:
-                  name:
-                    type: string
-                    example: Friendly Discount 1
-                  percent:
-                    type: number
-                    format: float
-                    example: 12.25
 
-    Customer: # if you update this, be sure to update as well the other yaml files
+
+    CustomerRead: # if you update this, be sure to update as well the other yaml files (there its called Customer)
+      description: Customer Object
+      type: object
+      additionalProperties: false
+      required: [ externalCrmId, externalId, firm, mwst, note, status, statusEc, language, bankAccountNumber, bankIBANNumber, bankClearingNumber, bankName, searchstring, vatType, softDeleted, commission, industry, addresses, mainAddress, contacts, tags, references, consultants, paymentTerm ]
       properties:
-        customer:
-          description: Customer Object
+        defaultDiscounts: # this is currently not in customer write
+          description: List of default discounts for the customer
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [ name, percent ]
+            properties:
+              name:
+                type: string
+                example: Friendly Discount 1
+              percent:
+                type: number
+                format: float
+                example: 12.25
+        externalCrmId:
+          description: External CRM Id for referencing the customer, the important ID of the CRM sync API.
+          type: string
+          nullable: true
+        externalId:
+          description: Not to be confused with externalCrmId, externalId is not important for the CRM sync API. It could be used to reference again something else.
+          type: string
+          nullable: true
+        firm:
+          description: Name of the customer
+          type: string
+        mwst:
+          description: VAT Number
+          type: string
+          nullable: true
+        note:
+          description: Note on the client
+          type: string
+        status:
+          description: States if the customer is active or inactive. 1 = active, 0 = inactive
+          type: integer
+          enum: [ 1, 0 ]
+        statusEc:
+          description: Customer type. 1 = Customer, 2 = Intermediator, 3 = Agency, 5 = Publisher (Only available with marketer module activated)
+          type: integer
+          enum: [ 1, 2, 3, 5 ]
+        language:
+          description: Preferred language for this customer
+          type: string
+          enum: [ de, en, fr, it ]
+        bankAccountNumber:
+          description: Bank Account Number for this customer
+          type: string
+          nullable: true
+        bankIBANNumber:
+          description: IBAN for this customer
+          type: string
+          nullable: true
+        bankClearingNumber:
+          description: Bank Clearing for this customer
+          type: string
+          nullable: true
+        bankName:
+          description: Bank name for this customer
+          type: string
+          nullable: true
+        searchstring:
+          description: Search help to find this customer easier with other name(s)
+          type: string
+          nullable: true
+        vatType:
+          description: VAT Type (0 = Standard, 2 = VAT exempt, 3 = VAT reduced, 7 = VAT exempt embassy)
+          type: integer
+          default: 0
+          enum: [ 0, 2, 3, 7 ]
+        softDeleted:
+          description: If this customer should be treated as deleted.
+          example: false
+          type: boolean
+          default: false
+        commission:
+          description: Defines the default commissions for an agency or intermediator. Has no effect on statusEc != 2 or 3.
           type: object
-          required: [ externalCrmId, firm, status, statusEc, language, mainAddress ]
+          additionalProperties: false
+          required: [ bkCommission, vmkCommission, type ]
+          properties:
+            bkCommission:
+              description: Agency Commission aka BK (Beraterkommission) aka AP (Agenturprovision) in percent
+              type: number
+            vmkCommission:
+              description: Intermediator Commission aka VMK (Vermittlerkommission) aka DBE (Direktbuchungsentschädigung) aka 2. Provision aka 2. Agentur-Provision in percent
+              type: number
+            type:
+              description: |
+                Type of commission. 
+                0 = Standard (default) = bkCommission direct / vmkCommission direct
+                2 = bkCommission direct / vmkCommission indirect (Accrual / Rückstellung)
+                3 = bkCommission separate / vmkCommission indirect (Accrual / Rückstellung)
+                4 = vmkCommission separate
+              type: integer
+              enum: [ 0, 2, 3, 4 ]
+        industry:
+          description: Customer industry
+          type: object
+          nullable: true
+          additionalProperties: false
+          required: [ externalCrmId, name ]
           properties:
             externalCrmId:
-              description: External CRM Id for referencing the customer, the important ID of the CRM sync API.
+              description: External CRM Id for referencing the industry
               type: string
               nullable: true
-            externalId:
-              description: Not to be confused with externalCrmId, externalId is not important for the CRM sync API. It could be used to reference again something else.
+            name:
+              description: Name of the industry
               type: string
-              nullable: true
-            firm:
-              description: Name of the customer
-              type: string
-            mwst:
-              description: VAT Number
-              type: string
-              nullable: true
-            note:
-              description: Note on the client
-              type: string
-            status:
-              description: States if the customer is active or inactive. 1 = active, 0 = inactive
-              type: integer
-              enum: [ 1, 0 ]
-            statusEc:
-              description: Customer type. 1 = Customer, 2 = Intermediator, 3 = Agency, 5 = Publisher (Only available with marketer module activated)
-              type: integer
-              enum: [ 1, 2, 3, 5 ]
-            language:
-              description: Preferred language for this customer
-              type: string
-              enum: [ de, en, fr, it ]
-            bankAccountNumber:
-              description: Bank Account Number for this customer
-              type: string
-              nullable: true
-            bankIBANNumber:
-              description: IBAN for this customer
-              type: string
-              nullable: true
-            bankClearingNumber:
-              description: Bank Clearing for this customer
-              type: string
-              nullable: true
-            bankName:
-              description: Bank name for this customer
-              type: string
-              nullable: true
-            searchstring:
-              description: Search help to find this customer easier with other name(s)
-              type: string
-              nullable: true
-            vatType:
-              description: VAT Type (0 = Standard, 2 = VAT exempt, 3 = VAT reduced, 7 = VAT exempt embassy)
-              type: integer
-              default: 0
-              enum: [ 0, 2, 3, 7 ]
-            softDeleted:
-              description: If this customer should be treated as deleted.
-              example: false
-              type: boolean
-              default: false
-            commission:
-              description: Defines the default commissions for an agency or intermediator. Has no effect on statusEc != 2 or 3.
-              type: object
-              required: [ bkCommission, vmkCommission, type ]
-              properties:
-                bkCommission:
-                  description: Agency Commission aka BK (Beraterkommission) aka AP (Agenturprovision) in percent
-                  type: number
-                vmkCommission:
-                  description: Intermediator Commission aka VMK (Vermittlerkommission) aka DBE (Direktbuchungsentschädigung) aka 2. Provision aka 2. Agentur-Provision in percent
-                  type: number
-                type:
-                  description: |
-                    Type of commission. 
-                    0 = Standard (default) = bkCommission direct / vmkCommission direct
-                    2 = bkCommission direct / vmkCommission indirect (Accrual / Rückstellung)
-                    3 = bkCommission separate / vmkCommission indirect (Accrual / Rückstellung)
-                    4 = vmkCommission separate
-                  type: integer
-                  enum: [ 0, 2, 3, 4 ]
-            industry:
-              description: Customer industry
-              type: object
-              nullable: true
-              required: [ externalCrmId ]
-              properties:
-                externalCrmId:
-                  description: External CRM Id for referencing the industry
+        addresses:
+          description: Customer addresses. Addresses added through this endpoint are merged with existing ones (upsert). Deleting existing addresses is not supported.
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [ externalCrmId, title, firm, department, street, number, addresstext, zip, place, country, externalId, sendingRule, sendingRuleAddresses, softDeleted, ]
+            properties:
+              externalCrmId:
+                description: External CRM Id for referencing the address
+                type: string
+              title:
+                description: Name/Label
+                type: string
+              firm:
+                description: Company
+                type: string
+              department:
+                description: Departement
+                type: string
+              street:
+                description: Street
+                type: string
+              number:
+                description: Street number
+                type: string
+              addresstext:
+                description: Addition
+                type: string
+              zip:
+                description: Zip code
+                type: string
+              place:
+                description: City/Place
+                type: string
+              country:
+                description: |
+                  Country (ISO 3166-1 alpha-2 Code) like "CH" / "DE" / "AT"
+                  https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+                type: string
+              externalId:
+                description: External Id
+                type: integer
+                nullable: true
+              sendingRule:
+                description: Invoice sending rule. Default is defined via admin center setting
+                nullable: true
+                type: string
+                enum: [ 'email', 'post' ]
+              sendingRuleAddresses:
+                description: E-Mail addresses for invoice sending. Only useful with sendingRule "email".
+                nullable: true
+                type: array
+                items:
                   type: string
-                  nullable: true
-                name:
-                  description: Name of the industry
-                  type: string
-            addresses:
-              description: Customer addresses. Addresses added through this endpoint are merged with existing ones (upsert). Deleting existing addresses is not supported.
-              type: array
-              items:
-                type: object
-                required: [ externalCrmId, title, firm, zip, place, country ]
-                properties:
-                  externalCrmId:
-                    description: External CRM Id for referencing the address
-                    type: string
-                  title:
-                    description: Name/Label
-                    type: string
-                  firm:
-                    description: Company
-                    type: string
-                  department:
-                    description: Departement
-                    type: string
-                  street:
-                    description: Street
-                    type: string
-                  number:
-                    description: Street number
-                    type: string
-                  adresstext:
-                    description: Addition
-                    type: string
-                  zip:
-                    description: Zip code
-                    type: string
-                  place:
-                    description: City/Place
-                    type: string
-                  country:
-                    description: |
-                      Country (ISO 3166-1 alpha-2 Code) like "CH" / "DE" / "AT"
-                      https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
-                    type: string
-                  externalId:
-                    description: External Id
-                    type: integer
-                    nullable: true
-                  sendingRule:
-                    description: Invoice sending rule. Default is defined via admin center setting
-                    nullable: true
-                    type: string
-                    enum: [ 'email', 'post' ]
-                  sendingRuleAddresses:
-                    description: E-Mail addresses for invoice sending. Only useful with sendingRule "email".
-                    nullable: true
-                    type: array
-                    items:
+              softDeleted:
+                description: If this address should be treated as deleted.
+                example: false
+                type: boolean
+                default: false
+        mainAddress:
+          description: Reference to the main address for this customer
+          type: object
+          additionalProperties: false
+          required: [ externalCrmId ]
+          nullable: true
+          properties:
+            externalCrmId:
+              description: External CRM Id for referencing the address.
+              type: string
+              nullable: true
+        contacts:
+          description: Customer contacts
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [ externalCrmId, peopleGender, peopleLastname, peopleName, peoplePhone, peopleNatel, peopleEmail, peopleStatus, lead, jobFunctions, pipelineStatus ]
+            properties:
+              externalCrmId:
+                description: External CRM Id for referencing the contact
+                type: string
+              peopleGender:
+                description: Gender. "M" = male, "F" = female, "D" = divers
+                type: string
+                enum: [ 'M', 'F', 'D' ]
+              peopleLastname:
+                description: Lastname
+                type: string
+              peopleName:
+                description: Surname
+                type: string
+              peoplePhone:
+                description: Phone Number
+                type: string
+              peopleNatel:
+                description: Mobile Number
+                type: string
+              peopleEmail:
+                description: E-Mail
+                type: string
+              peopleStatus:
+                description: Status active/inactive. "A" = active. "N" = not active.
+                type: string
+                default: A
+                enum: [ 'A', 'N' ]
+              lead:
+                description: |
+                  Contact is: 
+                  * `true`: contact is marked as lead. 
+                  * `false`: contact is not marked as lead.
+                type: boolean
+                default: false
+              jobFunctions:
+                description: Function name
+                type: array
+                items:
+                  type: object
+                  additionalProperties: false
+                  required: [ lang, function ]
+                  properties:
+                    lang:
+                      description: Language in which the function is used (deprecated). Use "de" always
                       type: string
-                  softDeleted:
-                    description: If this address should be treated as deleted.
-                    example: false
-                    type: boolean
-                    default: false
-            mainAddress:
-              description: Reference to the main address for this customer
-              type: object
-              required: [ externalCrmId ]
-              nullable: true
-              properties:
-                externalCrmId:
-                  description: External CRM Id for referencing the address.
-                  type: string
-                  nullable: true
-            contacts:
-              description: Customer contacts
-              type: array
-              items:
+                      enum: [ 'de' ]
+                    function:
+                      description: The function name
+                      type: string
+              pipelineStatus:
+                description:  A pipeline status can help to process leads and/or contacts and divide them into individual stages. The pipeline status is defined in the CRM Part of Admin Center.
                 type: object
-                required: [ externalCrmId, peopleGender, peopleLastname, peopleName ]
-                properties:
-                  externalCrmId:
-                    description: External CRM Id for referencing the contact
-                    type: string
-                  peopleGender:
-                    description: Gender. "M" = male, "F" = female, "D" = divers
-                    type: string
-                    enum: [ 'M', 'F', 'D' ]
-                  peopleLastname:
-                    description: Lastname
-                    type: string
-                  peopleName:
-                    description: Surname
-                    type: string
-                  peoplePhone:
-                    description: Phone Number
-                    type: string
-                  peopleNatel:
-                    description: Mobile Number
-                    type: string
-                  peopleEmail:
-                    description: E-Mail
-                    type: string
-                  peopleStatus:
-                    description: Status active/inactive. "A" = active. "N" = not active.
-                    type: string
-                    default: A
-                    enum: [ 'A', 'N' ]
-                  lead:
-                    description: |
-                      Contact is: 
-                      * `true`: contact is marked as lead. 
-                      * `false`: contact is not marked as lead.
-                    type: boolean
-                    default: false
-                  jobFunctions:
-                    description: Function name
-                    type: array
-                    items:
-                      type: object
-                      required: [ lang, function ]
-                      properties:
-                        lang:
-                          description: Language in which the function is used (deprecated). Use "de" always
-                          type: string
-                          enum: [ 'de' ]
-                        function:
-                          description: The function name
-                          type: string
-                  pipelineStatus:
-                    description:  A pipeline status can help to process leads and/or contacts and divide them into individual stages. The pipeline status is defined in the CRM Part of Admin Center.
-                    type: object
-                    nullable: true
-                    properties:
-                      externalCrmId:
-                        description: This refers to the pipeline externalCrmId defined in admin center.
-                        type: string
-                        nullable: true
-            tags:
-              description: Customer tags
-              type: array
-              items:
-                type: object
-                required: [ externalCrmId, name ]
-                properties:
-                  externalCrmId:
-                    description: External CRM Id for referencing the tag
-                    type: string
-                    nullable: true
-                  name:
-                    description: Name of the tag
-                    type: string
-            references:
-              description: Customer references
-              type: array
-              items:
-                type: object
+                nullable: true
+                additionalProperties: false
                 required: [ externalCrmId ]
                 properties:
                   externalCrmId:
-                    description: External CRM Id for referencing the customer reference
+                    description: This refers to the pipeline externalCrmId defined in admin center.
                     type: string
-                  referenceType:
-                    description: Type of the reference
-                    type: string
-                  referenceValue:
-                    description: Value of the reference
-                    type: string
-            consultants:
-              description: Customer consultants
-              type: array
-              items:
-                type: object
-                required: [ email ]
-                properties:
-                  email:
-                    description: E-Mail address of consultant
-                    type: string
-            paymentTerm:
-              description: Payment term for customer
+                    nullable: true
+        tags:
+          description: Customer tags
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [ externalCrmId, name ]
+            properties:
+              externalCrmId:
+                description: External CRM Id for referencing the tag
+                type: string
+                nullable: true
+              name:
+                description: Name of the tag
+                type: string
+        references:
+          description: Customer references
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [ externalCrmId, referenceType, referenceValue ]
+            properties:
+              externalCrmId:
+                description: External CRM Id for referencing the customer reference
+                type: string
+              referenceType:
+                description: Type of the reference
+                type: string
+              referenceValue:
+                description: Value of the reference
+                type: string
+        consultants:
+          description: Customer consultants
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [ email ]
+            properties:
+              email:
+                description: E-Mail address of consultant
+                type: string
+        paymentTerm:
+          description: Payment term for customer
+          type: object
+          additionalProperties: false
+          required: [ externalCrmId ]
+          properties:
+            externalCrmId:
+              description: External CRM Id for referencing the payment term
+              type: string
+            days:
+              description: Amount of days until the invoice has to be paid
+              type: integer
+            name:
+              description: Name of the payment term
+              type: string
+            cashDiscountDays:
+              description: How many days that a cash discount (skonto) can be applied
+              type: integer
+              nullable: true
+            cashDiscountPercent:
+              description: Percentage of cash discount (skonto) that can be applied
+              type: number
+              nullable: true
+            billingPhrases:
+              description: Text to print on invoice in different languages
               type: object
-              required: [ externalCrmId ]
+              nullable: true
               properties:
-                externalCrmId:
-                  description: External CRM Id for referencing the payment term
+                de:
+                  description: German text
                   type: string
-                days:
-                  description: Amount of days until the invoice has to be paid
-                  type: integer
-                name:
-                  description: Name of the payment term
+                en:
+                  description: English text
                   type: string
-                cashDiscountDays:
-                  description: How many days that a cash discount (skonto) can be applied
-                  type: integer
-                  nullable: true
-                cashDiscountPercent:
-                  description: Percentage of cash discount (skonto) that can be applied
-                  type: number
-                  nullable: true
-                billingPhrases:
-                  description: Text to print on invoice in different languages
-                  type: object
-                  nullable: true
-                  properties:
-                    de:
-                      description: German text
-                      type: string
-                    en:
-                      description: English text
-                      type: string
-                    fr:
-                      description: French text
-                      type: string
-                    it:
-                      description: Italian text
-                      type: string
+                fr:
+                  description: French text
+                  type: string
+                it:
+                  description: Italian text
+                  type: string
     Campaign:
       description: A goTom campaign
       type: object
@@ -1591,6 +1599,7 @@ components:
           example: Internal Server Error
 
     CustomerFoundResponse:
+      additionalProperties: false
       properties:
         ok:
           type: boolean
@@ -1598,6 +1607,7 @@ components:
           example: true
           description: Always `true` for this response
         customer:
+          additionalProperties: false
           $ref: '#/components/schemas/CustomerRead'
       required:
         - ok
