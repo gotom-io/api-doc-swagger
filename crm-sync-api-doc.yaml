@@ -258,7 +258,7 @@ components:
                   number:
                     description: Street number
                     type: string
-                  adresstext:
+                  addresstext:
                     description: Addition
                     type: string
                   zip:
