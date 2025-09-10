@@ -258,7 +258,7 @@ components:
                   number:
                     description: Street number
                     type: string
-                  adresstext:
+                  addresstext:
                     description: Addition
                     type: string
                   zip:
@@ -390,7 +390,7 @@ components:
                     description: Value of the reference
                     type: string
             consultants:
-              description: Customer consultants
+              description: Customer consultants. Cannot be set to empty/null, will only update if a consultant email is provided.
               type: array
               items:
                 type: object
