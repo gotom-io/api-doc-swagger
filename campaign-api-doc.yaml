@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.4.5
+  version: 4.4.6
   title: goTom Campaign API
 
 x-explorer-enabled: false # this disables the "try me" button for test requests on readme.com
@@ -906,7 +906,7 @@ components:
                 type: boolean
                 default: false
               jobFunctions:
-                description: Function name
+                description: This is an array of objects for historic reasons, but only 1 object is supported with lang 'de'.
                 type: array
                 items:
                   type: object
