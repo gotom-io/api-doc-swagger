@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.4.6
+  version: 4.4.7
   title: goTom CRM Sync API
 
 x-explorer-enabled: false # this disables the "try me" button for test requests on readme.com
@@ -173,6 +173,16 @@ components:
               description: Customer type. 1 = Customer, 2 = Intermediator, 3 = Agency, 5 = Publisher (Only available with marketer module activated)
               type: integer
               enum: [1, 2, 3, 5]
+            pipelineStatus:
+              description: Pipeline statuses depend on a type (e.g. contact, or customer) and cannot be shared between types. A pipeline status can help to process leads and/or contacts and divide them into individual stages. The pipeline status is defined in the CRM Part of Admin Center.
+              type: object
+              nullable: true
+              additionalProperties: false
+              required: [ externalCrmId ]
+              properties:
+                externalCrmId:
+                  description: This refers to the pipeline externalCrmId defined in admin center.
+                  type: string
             language:
               description: Preferred language for this customer
               type: string
