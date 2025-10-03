@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.4.6
+  version: 4.4.7
   title: goTom Campaign API
 
 x-explorer-enabled: false # this disables the "try me" button for test requests on readme.com
@@ -921,7 +921,7 @@ components:
                       description: The function name
                       type: string
               pipelineStatus:
-                description:  A pipeline status can help to process leads and/or contacts and divide them into individual stages. The pipeline status is defined in the CRM Part of Admin Center.
+                description: Pipeline statuses depend on a type (e.g. contact, or customer) and cannot be shared between types. A pipeline status can help to process leads and/or contacts and divide them into individual stages. The pipeline status is defined in the CRM Part of Admin Center.
                 type: object
                 nullable: true
                 additionalProperties: false
