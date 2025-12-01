@@ -723,6 +723,13 @@ components:
           description: Customer type. 1 = Customer, 2 = Intermediator, 3 = Agency, 5 = Publisher (Only available with marketer module activated)
           type: integer
           enum: [ 1, 2, 3, 5 ]
+        pipelineStatus:
+          type: object
+          properties:
+            externalCrmId:
+              type: string
+              example: customer-contacted
+              nullable: true
         language:
           description: Preferred language for this customer
           type: string
