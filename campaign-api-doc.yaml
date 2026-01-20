@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.4.8
+  version: 4.4.9
   title: goTom Campaign API
 
 x-explorer-enabled: false # this disables the "try me" button for test requests on readme.com
@@ -83,6 +83,7 @@ paths:
              * `8d6a458b-362a-4b13-b3bb-fe0772a4fc7e` - If you have supplied a currency which is not configured for
                your goTom instance you will get this error
              * `6b3befbc-2f01-4ddf-be21-b57898905284` - If a dynamic expression constraint failed. Check the error message for further info.
+             * `7e44e734-3535-4172-8e32-0efa8b33a5e0` - The value of the billingType is not valid, only supported billingTypes can be used
           content:
             application/json:
               schema:
@@ -147,6 +148,8 @@ paths:
              * `ec75ef78-1db7-4469-a7fc-b14a71e5dbee` - Cannot change campaign agency  because flights were already invoiced in this campaign.
              * `9e8d02a8-f693-4df3-869e-a16d196d9d8a` - Cannot change campaign intermediator  because flights were already invoiced in this campaign.
              * `800b5cad-7f13-4b27-b3d6-74fa3c47b4e1` - Cannot change campaign currency  because flights were already invoiced in this campaign.
+             * `7e44e734-3535-4172-8e32-0efa8b33a5e0` - The value of the billingType is not valid, only supported billingTypes can be used
+             * `43452cb6-8850-4036-b1f5-971c8328e10b` - The update payload contains a billingType update but the campaign is already invoiced so the billingType can't be changed.
           content:
             application/json:
               schema:
@@ -1070,6 +1073,34 @@ components:
           description: Corresponds to the "Dokumente" field. If true, the invoice will be created with an appendix e.g. the Order Confirmation; if false, it will be created without one, as default it would be true.
           type: boolean
           default: true
+        billingType:
+          type: integer
+          enum: [ 0, 1, 2, 3 ]
+          example: 0
+          description: >
+            Corresponds with the field "Billing type" / "Abrechnungsart" on the "Invoicing" / "Billing type" view of the campaign.
+            
+            Use this value only if you want to explicitly define the billing type of the campaign. You can safely omit this value
+            to let goTom apply the rules for finding the right billing type for this campaign.
+            
+            Billing type possible values and their meaning:
+            
+             * `0` - Custom - The user must explicitly set up the invoices and assign flights
+             * `1` - End / Nach Ablauf - All flights are automatically assigned to one invoice
+             * `2` - Monthly to daily value /  Monatlich nach Tageswert - Automatic assignment on a monthly basis, distributed by time
+             * `3` - Monthly to delivery value / Monatlich nach Lieferwert - Automatic assignment on a monthly basis, distributed by delivery value
+             
+            Please note, that your instance may not support all values. If your instance does not have an
+            ad-server integration the value for "Monthly to delivery value" can't be used.
+            If you use a value that is not supported by your instance, you will get an
+            API error (code `7e44e734-3535-4172-8e32-0efa8b33a5e0`) with the list of the possible values
+            for your instance.
+            
+            If the campaign has at least one invoice that has already been invoiced it is also not possible
+            to change this value to something different. If this is the case you will get the API
+            error code `43452cb6-8850-4036-b1f5-971c8328e10b` and *none* of the updates in the payload
+            will be applied.
+
 
     CampaignUpdate:
       allOf:
