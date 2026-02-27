@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  version: 4.4.10
+  version: 4.4.11
   title: Campaign API
 
 x-explorer-enabled: false # this disables the "try me" button for test requests on readme.com
@@ -32,6 +32,7 @@ paths:
               - media
               - advertising
               - flightPositionType
+              - flightTags
           required: true
         - in: query
           name: page
@@ -1295,6 +1296,13 @@ components:
               description: Comma separated list of zip codes
               type: string
 
+        flightTags:
+          description: Tags of the flight. Corresponds with the "Flight Tags" Field in the UI of the "Umsatzarten" / "Revenue Types" campaign view
+            When creating/updating only the array with IDs are expected, send null or an empty array to clear the tags on update.
+          type: array
+          items:
+            type: integer
+
     FlightCreate:
       required:
         - externalId
@@ -1316,6 +1324,8 @@ components:
               type: string
 
     FlightRead:
+      required:
+        - flightTags
       allOf:
         - $ref: "#/components/schemas/FlightCreate"
       properties:
@@ -1323,6 +1333,16 @@ components:
           description: Notice that even when setting to null, a default value might be used in the app as seen in the primary key endpoint. The flight read returns the default value.
           type: string
           nullable: true
+        flightTags:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              name:
+                type: string
+
     FlightSublines:
       description: Represents the sublines for a flight (only for network flights)
       type: object
