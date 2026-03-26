@@ -34,7 +34,7 @@ paths:
         '200':
           description: The report as csv file
           content:
-            text/csv;charset=UTF-8:
+            text/csv;charset=utf-8:
               schema:
                 type: string
                 format: binary
@@ -91,7 +91,7 @@ paths:
         '200':
           description: The report as csv file
           content:
-            text/csv;charset=UTF-8:
+            text/csv;charset=utf-8:
               schema:
                 type: string
                 format: binary
