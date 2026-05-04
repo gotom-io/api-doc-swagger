@@ -1408,7 +1408,7 @@ components:
           pattern: '^\d{2}:\d{2}$'
 
     KeyValueResultXandr:
-      description: Xandr key-value targeting result set. The values are only active if the adServerId on the flight matches this adServerId.
+      description: Corresponds with the field "Targeting Configuration -> Key /values". Use this part only for Xandr flights. The values are only active if the adServerId on the flight matches this adServerId.
       type: object
       additionalProperties: false
       required: [ adServerId, keyValueSets ]
@@ -1610,6 +1610,7 @@ components:
                * `4` - Agency rebate separate
 
     KeyValueSet:
+      description: Corresponds with the field "Targeting Configuration -> Key /values". Only available with Google Ad Manager
       properties:
         adServerId:
           type: string
