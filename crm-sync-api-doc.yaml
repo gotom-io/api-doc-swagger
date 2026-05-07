@@ -910,6 +910,134 @@ components:
                     it:
                       description: Italian text
                       type: string
+
+    KeyValueResultXandr:
+      description: Xandr key-value targeting result set
+      type: object
+      additionalProperties: false
+      required: [ adServerId, keyValueSets ]
+      properties:
+        adServerId:
+          description: Ad server identifier for Xandr
+          type: string
+          example: xandr1
+        keyValueSets:
+          description: Array of key-value set groups
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/KeyValueSetXandr'
+        outerOp:
+          description: Outer logical operator combining key-value set groups
+          type: string
+          enum: [ AND, OR ]
+          default: AND
+        innerOp:
+          description: Inner logical operator combining keys within a set (inverse of outerOp)
+          type: string
+          enum: [ AND, OR ]
+          default: OR
+
+    KeyValueSetXandr:
+      description: A set of Xandr key-value definitions
+      type: object
+      additionalProperties: false
+      required: [ set ]
+      properties:
+        set:
+          description: Array of key-value definitions (string or numeric)
+          type: array
+          minItems: 1
+          items:
+            oneOf:
+              - $ref: '#/components/schemas/KeyValueXandr'
+              - $ref: '#/components/schemas/KeyValueXandrNumeric'
+
+    KeyValueXandr:
+      description: Xandr string key-value definition
+      type: object
+      additionalProperties: false
+      required: [ id, name, values ]
+      properties:
+        id:
+          description: Key identifier
+          type: string
+          example: '39746'
+        name:
+          description: Key name
+          type: string
+          example: Foobar
+        displayName:
+          description: Display name for the key
+          type: string
+          example: Barfoo
+        values:
+          description: Array of key-value pairs
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/KeyValueValueXandr'
+        comparisonOperator:
+          description: Comparison operator. '0' = equals, '1' = not equals
+          type: string
+          enum: [ '0', '1' ]
+          default: '0'
+        not:
+          description: Negate the key-value match
+          type: boolean
+          default: false
+
+    KeyValueXandrNumeric:
+      description: Xandr numeric key-value definition
+      type: object
+      additionalProperties: false
+      required: [ id, name ]
+      properties:
+        id:
+          description: Key identifier
+          type: string
+          example: '2571139747'
+        name:
+          description: Key name
+          type: string
+          example: Foobaz
+        displayName:
+          description: Display name for the key
+          type: string
+          example: Bazfoo
+        numericValue:
+          description: Numeric value for the key
+          type: string
+          example: '6'
+        comparisonOperator:
+          description: Comparison operator. '0' = equals, '1' = not equals
+          type: string
+          enum: [ '0', '1' ]
+          default: '0'
+        not:
+          description: Negate the key-value match
+          type: boolean
+          default: false
+
+    KeyValueValueXandr:
+      description: Individual Xandr key-value entry
+      type: object
+      additionalProperties: false
+      required: [ id, name ]
+      properties:
+        id:
+          description: Value identifier
+          type: string
+          example: '48228166'
+        name:
+          description: Value name
+          type: string
+          example: baz
+        displayName:
+          description: Display name for the value
+          type: string
+          example: ''
+
   parameters:
     ParamCustomerExternalCrmId:
       in: path
