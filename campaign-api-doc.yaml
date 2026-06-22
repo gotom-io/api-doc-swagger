@@ -123,7 +123,7 @@ paths:
         - in: query
           name: update_commissions
           schema:
-            type: boolean
+            type: integer
             default: 1
             enum: [ 0, 1 ]
           description: >
@@ -221,7 +221,7 @@ paths:
       summary: Retrieve a flight
       responses:
         '200':
-          description: Return the campaign data
+          description: Return the flight data
           content:
             application/json:
               schema:
@@ -301,6 +301,11 @@ paths:
       tags: [CampaignDiscount]
       summary: Create a campaign discount
       description: A reason for a campaign discount is to e.g. be able to collect all flight discounts to a single column in finance documents.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampaignDiscountWrite'
       responses:
         '201':
           description: Campaign discount has been created.
@@ -325,15 +330,6 @@ paths:
       responses:
         '204':
           description: Campaign discount has been updated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  name:
-                    description: This name will appear e.g. in finance documents
-                    type: string
-                    example: "Great discount for john doe"
         '400':
           description: >
             Returns a list of errors in the input data. For this call the following violation codes can be expected errors:
@@ -472,7 +468,7 @@ paths:
       description: Retrieve the flight's sublines. This endpoint only available if the marketer network module is active.
       responses:
         '200':
-          description: Return the campaign data
+          description: Return the flight's sublines
           content:
             application/json:
               schema:
@@ -810,17 +806,17 @@ components:
           description: this is the external id of this flight discount
           type: string
           example: flightDiscountExternalId1234
-        amountPercent:
-          type: number
-          example: 33.33
-        amountSum:
-          type: number
-          example: 0
       oneOf:
-        - required:
-            - amountPercent
-        - required:
-            - amountSum
+        - required: [amountPercent]
+          properties:
+            amountPercent:
+              type: number
+              example: 33.33
+        - required: [amountSum]
+          properties:
+            amountSum:
+              type: number
+              example: 0
 
     CampaignDiscountWrite:
       type: object
@@ -892,28 +888,26 @@ components:
           example: 0
 
     FlightDiscountCreate:
+      type: object
       properties:
         flightExternalId:
           type: string
         externalId:
           type: string
         amountPercent:
-          description: "Note: The schemas used for creating and updating flight discounts differ for `amountPercent` and `amountSum`."
           type: number
           format: float
           example: 20.5
-          nullable: true
         amountSum:
-          description: "Note: The schemas used for creating and updating flight discounts differ for `amountPercent` and `amountSum`."
           type: number
           format: float
-          example: null
-          nullable: true
+          example: 0
       required:
         - flightExternalId
         - externalId
-        - amountPercent
-        - amountSum
+      oneOf:
+        - required: [amountPercent]
+        - required: [amountSum]
 
     FlightDiscountUpdate:
       type: object

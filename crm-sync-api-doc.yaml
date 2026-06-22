@@ -556,32 +556,32 @@ components:
 
     CustomerErrorLogResponse:
       description: The logs available when retrieving the customer
-      type: object
-      properties:
-        jobStatus:
-          description: The status of the job in the queue, where JOB_STATUS_FINISHED_OK means all ok
-          enum: ['NO_JOB_FOUND', 'JOB_STATUS_WAITING', 'JOB_STATUS_FINISHED_OK', 'JOB_STATUS_FINISHED_ERROR']
-          type: string
-        sentJobId:
-          description: job Id sent by you.
-          type: integer
-          example: 12
       allOf:
+        - type: object
+          properties:
+            jobStatus:
+              description: The status of the job in the queue, where JOB_STATUS_FINISHED_OK means all ok
+              enum: ['NO_JOB_FOUND', 'JOB_STATUS_WAITING', 'JOB_STATUS_FINISHED_OK', 'JOB_STATUS_FINISHED_ERROR']
+              type: string
+            sentJobId:
+              description: job Id sent by you.
+              type: integer
+              example: 12
         - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
 
     UpdateCustomerResponse:
-      description: Response for successful, failed and unfinished costumer update jobs.
-      type: object
-      properties:
-        jobId:
-          description: The job id. Currently this id can reset upon reboot of the server e.g. is not necessarily unique.
-          type: integer
-          example: 123
-        jobAlreadyFinished:
-          description: Whether or not the job was able to return synchronously e.g. if true means the job was processed before the response was returned and thus the logs are returned as well in the response. False means the job still awaits processing.
-          type: boolean
-          example: true
+      description: Response for successful, failed and unfinished customer update jobs.
       allOf:
+        - type: object
+          properties:
+            jobId:
+              description: The job id. Currently this id can reset upon reboot of the server e.g. is not necessarily unique.
+              type: integer
+              example: 123
+            jobAlreadyFinished:
+              description: Whether or not the job was able to return synchronously e.g. if true means the job was processed before the response was returned and thus the logs are returned as well in the response. False means the job still awaits processing.
+              type: boolean
+              example: true
         - $ref: "#/components/schemas/CrmSyncErrorLogsMixin"
 
     CrmSyncErrorLogsMixin:
